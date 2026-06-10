@@ -3,53 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Score & Berita Acara - SEMARAK SPENSANECI 57</title>
+  <title>Live Score & Berita Acara - SEMARAK SPENSANECI</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Library untuk Generate PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <style>
     body { background-color: #0f172a; color: #f8fafc; font-family: 'Segoe UI', sans-serif; }
+    
+    /* Desain Logo Bulat Presisi di Dashboard */
+    .logo-circle-dash {
+      width: 80px; height: 80px; border-radius: 50%; overflow: hidden;
+      background: #fff; border: 3px solid #38bdf8; display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(56, 189, 248, 0.25);
+    }
+    .logo-circle-dash img { width: 100%; height: 100%; object-fit: cover; }
+
     .table-dark-custom { background-color: #1e293b; border-radius: 12px; overflow: hidden; }
     .table-dark-custom th { background-color: #334155; color: #38bdf8; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border: none; padding: 15px; }
-    .table-dark-custom td { padding: 15px; vertical-align: middle; border-color: #334155; color: #cbd5e1; }
+    .table-dark-custom td { padding: 15px; vertical-align: middle; border-color: #334155; color: #cbd5e1; transition: all 0.3s ease; }
+    
     .rank-badge { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-weight: bold; font-size: 0.95rem; }
     .rank-1 { background-color: #eab308; color: #0f172a; box-shadow: 0 0 12px rgba(234,179,8,0.4); }
     .rank-2 { background-color: #cbd5e1; color: #0f172a; }
     .rank-3 { background-color: #b45309; color: #fff; }
+    
     .status-badge { padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.8rem; }
     .status-selesai { background-color: #065f46; color: #34d399; }
     .status-kerja { background-color: #1e3a8a; color: #60a5fa; }
     .header-panel { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-bottom: 2px solid #334155; }
     
-    /* Styling Khusus Kertas PDF Print */
+    /* Efek Pulse Halus Mini untuk Loading Sinkronisasi Data */
+    .sync-loader { display: inline-block; width: 10px; height: 10px; background-color: #38bdf8; border-radius: 50%; animation: pulse-anim 1.5s infinite ease-in-out; margin-right: 8px; }
+    @keyframes pulse-anim { 0%, 100% { transform: scale(0.6); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 1; } }
+
+    /* Styling Kertas PDF Kop Surat */
     #pdf-container { display: none; }
     .a4-print-box { width: 210mm; min-height: 297mm; padding: 20mm; background: white; color: black; font-family: 'Times New Roman', Times, serif; box-sizing: border-box; }
     .kop-surat { border-bottom: 4px solid black; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; text-align: center; }
-    .kop-surat img { width: 90px; height: auto; }
-    .kop-surat h2 { font-weight: bold; font-size: 22px; margin: 0; }
-    .kop-surat h1 { font-weight: bold; font-size: 28px; margin: 5px 0; }
+    
+    .logo-pdf-circle { width: 75px; height: 75px; border-radius: 50%; overflow: hidden; border: 2px solid black; display: inline-block; }
+    .logo-pdf-circle img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .kop-surat h2 { font-weight: bold; font-size: 20px; margin: 0; letter-spacing: 0.5px; }
+    .kop-surat h1 { font-weight: bold; font-size: 26px; margin: 5px 0; }
     .tabel-pdf { width: 100%; border-collapse: collapse; margin-top: 20px; margin-bottom: 50px; font-size: 16px; }
     .tabel-pdf th, .tabel-pdf td { border: 1px solid black; padding: 10px; text-align: center; }
-    .tabel-pdf th { background-color: #e2e8f0 !important; font-weight: bold; }
+    .tabel-pdf th { background-color: #f1f5f9 !important; font-weight: bold; }
     .ttd-box { display: flex; justify-content: space-between; margin-top: 50px; text-align: center; font-size: 16px; }
   </style>
 </head>
 <body>
 
-  <!-- HEADER DASHBOARD LIVE SCORE -->
+  <!-- HEADER DASHBOARD LIVE SCORE (DIAPIT DUA LOGO BULAT) -->
   <div class="header-panel py-4 mb-4 shadow-sm">
     <div class="container d-flex justify-content-between align-items-center mb-3">
-      <img src="logo.png" alt="Logo Kiri" style="height: 80px;">
+      <div class="logo-circle-dash"><img src="logo.png" alt="Logo Kiri"></div>
       <div class="text-center px-3">
         <h2 class="fw-bold text-info m-0" style="letter-spacing: 1px;">LIVE SCORE SEMARAK SPENSANECI</h2>
-        <p class="text-muted m-0 mt-1">Data diperbarui otomatis secara real-time</p>
+        <p class="text-muted m-0 mt-1">Papan Peringkat Real-Time Peserta</p>
       </div>
-      <img src="logo2.png" alt="Logo Kanan" style="height: 80px;">
+      <div class="logo-circle-dash" style="border-color: #ffc107;"><img src="logo2.png" alt="Logo Kanan"></div>
     </div>
     <div class="container d-flex justify-content-between align-items-end">
       <button onclick="downloadPDF()" class="btn btn-danger fw-bold shadow-sm">📥 Unduh Berita Acara Juara 1-4 (PDF)</button>
-      <span class="badge bg-secondary p-2 fs-6" id="last-update">Menghubungkan ke server...</span>
+      <div class="d-flex align-items-center bg-dark px-3 py-2 rounded border border-secondary">
+        <div class="sync-loader"></div>
+        <span class="text-light small" id="last-update">Menghubungkan ke server...</span>
+      </div>
     </div>
   </div>
 
@@ -79,55 +99,55 @@
   <!-- CONTAINER TERSEMBUNYI UNTUK FORMAT CETAK PDF BERITA ACARA (A4) -->
   <div id="pdf-container">
     <div id="pdf-content" class="a4-print-box">
-      <!-- KOP SURAT PDF -->
+      <!-- KOP SURAT PDF DIAPIT DUA LOGO BULAT -->
       <div class="kop-surat">
-        <img src="logo.png" alt="Logo Kiri">
+        <div class="logo-pdf-circle"><img src="logo.png" alt="Logo Kiri"></div>
         <div>
           <h2>PANITIA PELAKSANA</h2>
           <h1>SEMARAK SPENSANECI 57</h1>
         </div>
-        <img src="logo2.png" alt="Logo Kanan">
+        <div class="logo-pdf-circle"><img src="logo2.png" alt="Logo Kanan"></div>
       </div>
 
       <!-- ISI BERITA ACARA -->
       <div style="text-align: center; margin-bottom: 20px;">
-        <h3 style="text-decoration: underline; font-weight: bold; margin-bottom: 5px;">BERITA ACARA HASIL LOMBA</h3>
+        <h3 style="text-decoration: underline; font-weight: bold; margin-bottom: 5px;">BERITA ACARA HASIL REKAPITULASI JUARA</h3>
       </div>
       
-      <p style="text-align: justify; font-size: 16px; line-height: 1.5; margin-bottom: 15px;">
-        Berdasarkan hasil penilaian <i>Live Score Computer Assisted Test (CAT)</i> pada event Semarak Spensaneci ke-57, berikut adalah rekapitulasi data peserta yang berhasil meraih peringkat <b>Juara 1 sampai 4</b>:
+      <p style="text-align: justify; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+        Berdasarkan hasil perolehan nilai resmi sistem ujian berbasis komputer pada kegiatan Semarak Spensaneci ke-57, panitia mengesahkan data peserta terbaik yang meraih peringkat <b>Juara 1 sampai 4</b> sebagai berikut:
       </p>
 
       <table class="tabel-pdf">
         <thead>
           <tr>
-            <th>Peringkat</th>
-            <th>No. Peserta</th>
+            <th style="width: 15%;">Peringkat</th>
+            <th style="width: 20%;">No. Peserta</th>
             <th>Nama Lengkap</th>
             <th>Asal Sekolah</th>
-            <th>Skor Akhir</th>
+            <th style="width: 18%;">Skor Akhir</th>
           </tr>
         </thead>
         <tbody id="pdf-table-body">
-          <!-- Tabel ini akan diisi secara otomatis oleh Javascript khusus untuk Juara 1-4 -->
+          <!-- Otomatis terisi Juara 1-4 -->
         </tbody>
       </table>
 
-      <p style="text-align: justify; font-size: 16px; line-height: 1.5;">
-        Demikian berita acara hasil rekapitulasi ini dibuat dengan sebenar-benarnya dan bersifat mutlak sesuai dengan perolehan nilai pada sistem <i>database</i> perlombaan.
+      <p style="text-align: justify; font-size: 16px; line-height: 1.6;">
+        Demikian berita acara hasil perlombaan ini diterbitkan secara sah, bersifat mengikat, dan tidak dapat diganggu gugat.
       </p>
 
-      <!-- TANDA TANGAN -->
+      <!-- TANDA TANGAN (KEDUA PEJABAT SESUAI REQUEST) -->
       <div class="ttd-box">
         <div style="width: 45%;">
           <p style="margin: 0;">Mengetahui,</p>
-          <p style="margin: 0;">Penanggung Jawab Lomba</p>
+          <p style="margin: 0; font-weight: bold;">Penanggung Jawab Lomba</p>
           <br><br><br><br>
           <p style="margin: 0; font-weight: bold; text-decoration: underline;">RODIAH, S.Pd.</p>
         </div>
         <div style="width: 45%;">
           <p style="margin: 0;">Ditetapkan di: .........................</p>
-          <p style="margin: 0;">Ketua Pelaksana</p>
+          <p style="margin: 0; font-weight: bold;">Ketua Pelaksana</p>
           <br><br><br><br>
           <p style="margin: 0; font-weight: bold; text-decoration: underline;">EKA FITRIA SANTIKA, S.Pd.</p>
         </div>
@@ -151,17 +171,16 @@
     }
 
     function renderTable(data) {
-      // 1. Render Tabel Papan Skor Normal (Dashboard Visual)
       var tbody = document.getElementById('results-table-body');
-      tbody.innerHTML = "";
       
       if(data.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Belum ada peserta yang login.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='7' class='text-center py-4 text-muted'>Belum ada peserta yang aktif.</td></tr>";
         return;
       }
 
+      // Pembaruan Mulus (Mengganti isi tanpa merusak baris/tanpa kedipan kasar)
+      var htmlContent = "";
       data.forEach(function(row, index) {
-        var tr = document.createElement('tr');
         var rankNum = index + 1;
         var rankDisplay = "<div class='rank-badge mx-auto'>" + rankNum + "</div>";
         if(rankNum === 1) rankDisplay = "<div class='rank-badge rank-1 mx-auto'>1</div>";
@@ -170,65 +189,67 @@
 
         var statusClass = row.status === "Selesai" ? "status-selesai" : "status-kerja";
 
-        tr.innerHTML = 
+        htmlContent += "<tr>" +
           "<td class='text-center'>" + rankDisplay + "</td>" +
           "<td class='fw-bold text-warning'>" + row.noPeserta + "</td>" +
           "<td class='fw-bold text-white'>" + row.namaPeserta + "</td>" +
           "<td>" + row.asalSekolah + "</td>" +
           "<td class='text-center fw-bold text-info fs-5'>" + row.skor + "</td>" +
           "<td class='text-center'>" + row.waktu + "</td>" +
-          "<td class='text-center'><span class='status-badge " + statusClass + "'>" + row.status + "</span></td>";
-        tbody.appendChild(tr);
+          "<td class='text-center'><span class='status-badge " + statusClass + "'>" + row.status + "</span></td>" +
+          "</tr>";
       });
+      tbody.innerHTML = htmlContent;
 
-      // 2. Render Tabel Tersembunyi Khusus PDF (Hanya Juara 1-4)
+      // Update isi Tabel PDF Khusus Juara 1-4 secara simultan
       var pdfTbody = document.getElementById('pdf-table-body');
-      pdfTbody.innerHTML = "";
-      var top4Data = data.slice(0, 4); // Potong hanya untuk 4 orang teratas
+      var pdfHtml = "";
+      var top4Data = data.slice(0, 4);
       
-      top4Data.forEach(function(row, index) {
-        var titleJuara = "Juara " + (index + 1);
-        var pdfTr = document.createElement('tr');
-        pdfTr.innerHTML = 
-          "<td><b>" + titleJuara + "</b></td>" +
-          "<td>" + row.noPeserta + "</td>" +
-          "<td style='text-align: left;'>" + row.namaPeserta + "</td>" +
-          "<td style='text-align: left;'>" + row.asalSekolah + "</td>" +
-          "<td><b>" + row.skor + "</b></td>";
-        pdfTbody.appendChild(pdfTr);
-      });
+      for (var i = 0; i < 4; i++) {
+        var titleJuara = "Juara " + (i + 1);
+        if (top4Data[i]) {
+          pdfHtml += "<tr>" +
+            "<td><b>" + titleJuara + "</b></td>" +
+            "<td>" + top4Data[i].noPeserta + "</td>" +
+            "<td style='text-align: left;'>" + top4Data[i].namaPeserta + "</td>" +
+            "<td style='text-align: left;'>" + top4Data[i].asalSekolah + "</td>" +
+            "<td><b>" + top4Data[i].skor + "</b></td>" +
+            "</tr>";
+        } else {
+          // Jika peserta belum mencapai 4 orang, sediakan baris kosong terformat rapi
+          pdfHtml += "<tr><td><b>" + titleJuara + "</b></td><td>-</td><td>Belum Ada Data</td><td>-</td><td>-</td></tr>";
+        }
+      }
+      pdfTbody.innerHTML = pdfHtml;
 
       var now = new Date();
-      document.getElementById('last-update').innerText = "Update: " + now.toLocaleTimeString('id-ID') + " WIB";
+      document.getElementById('last-update').innerText = "Terhubung - Live: " + now.toLocaleTimeString('id-ID') + " WIB";
     }
 
     function downloadPDF() {
-      // Menampilkan template PDF sebentar dari hidden state agar library bisa membacanya dengan sempurna
       var container = document.getElementById('pdf-container');
       container.style.display = 'block';
       container.style.position = 'absolute';
-      container.style.left = '-9999px'; // Sembunyikan dari layar user tapi tetap render di DOM
+      container.style.left = '-9999px';
 
       var element = document.getElementById('pdf-content');
       var opt = {
         margin:       0,
-        filename:     'Berita_Acara_Juara_Spensaneci.pdf',
+        filename:     'Berita_Acara_Juara_Spensaneci_57.pdf',
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  { scale: 2, useCORS: true },
         jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
       
-      // Proses Generate
       html2pdf().set(opt).from(element).save().then(function() {
-        // Kembalikan div ke posisi disembunyikan setelah download selesai
         container.style.display = 'none';
         container.style.position = 'static';
       });
     }
 
-    // Eksekusi Live Score
     fetchLiveScore();
-    setInterval(fetchLiveScore, 5000);
+    setInterval(fetchLiveScore, 3000); // interval dipercepat ke 3 detik agar terasa instan/mulus
   </script>
 </body>
 </html>
