@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web CAT - SEMARAK SPENSANECI 57</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color: #f4f6f9; font-family: 'Segoe UI', Arial, sans-serif; }
+    .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .nav-box { width: 42px; height: 42px; line-height: 40px; text-align: center; border: 1px solid #ced4da; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px; display: inline-block; background-color: #fff; transition: all 0.2s; }
+    .nav-box.answered { background-color: #198754; color: #fff; border-color: #198754; }
+    .nav-box.doubtful { background-color: #ffc107; color: #000; border-color: #ffc107; }
+    .nav-box.current { border: 2.5px solid #0d6efd; box-shadow: 0 0 6px rgba(13,110,253,0.4); }
+    .timer { font-size: 1.6rem; font-weight: 700; color: #dc3545; background: #ffebeb; padding: 5px 15px; border-radius: 8px; display: inline-block; }
+    .option-container { border: 1px solid #dee2e6; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; }
+    .option-container:hover { background-color: #f1f3f5; border-color: #adb5bd; }
+    .option-container input { margin-right: 15px; transform: scale(1.2); cursor: pointer; }
+    .option-container.selected { background-color: #e7f1ff; border-color: #9ec5fe; font-weight: 600; }
+    .hidden { display: none !important; }
+    .soal-text { font-size: 1.15rem; line-height: 1.6; white-space: pre-line; }
+  </style>
+</head>
+<body>
+
+  <!-- KOP HEADER INDEX -->
+  <div class="container mt-4 mb-3 d-flex align-items-center justify-content-center gap-3" id="header-lomba">
+    <img src="logo.png" alt="Logo Kiri" style="height: 70px;">
+    <h1 class="fw-bold m-0 text-primary" style="letter-spacing: 1px;">SEMARAK SPENSANECI 57</h1>
+  </div>
+
+  <div class="container my-4">
+    <!-- HALAMAN LOGIN -->
+    <div id="login-page" class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card p-4 border-top border-primary border-4">
+          <div class="card-body text-center">
+            <!-- LOGO 2 DI ATAS LOGIN -->
+            <img src="logo2.png" alt="Logo Atas Login" class="mb-3" style="height: 80px;">
+            <h3 class="mb-4 fw-bold text-dark">Login Peserta Ujian</h3>
+            
+            <div class="text-start">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Nomor Peserta (Dari Panitia)</label>
+                <input type="text" id="no-peserta" class="form-control form-control-lg text-uppercase" placeholder="Contoh: HUT001" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Nama Lengkap Anda</label>
+                <input type="text" id="nama-peserta" class="form-control form-control-lg" placeholder="Masukkan nama lengkap" required>
+              </div>
+              <div class="mb-4">
+                <label class="form-label fw-semibold">Asal Sekolah</label>
+                <input type="text" id="asal-sekolah" class="form-control form-control-lg" placeholder="Masukkan nama sekolah" required>
+              </div>
+              <button onclick="validateAndStart()" id="btn-login" class="btn btn-primary btn-lg w-100 fw-bold">Masuk & Mulai Ujian</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HALAMAN LOADING -->
+    <div id="loading-page" class="text-center hidden my-5">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+      <h5 class="mt-3 text-muted fw-semibold" id="loading-text">Memproses pendaftaran... Harap tunggu.</h5>
+    </div>
+
+    <!-- HALAMAN RUANG UJIAN -->
+    <div id="exam-page" class="row hidden">
+      <div class="col-md-8 mb-4">
+        <div class="card p-4 h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <h4 class="fw-bold text-secondary" id="soal-title">Soal No. 1</h4>
+              <div class="timer" id="timer-display">00:00</div>
+            </div>
+            <div id="image-container" class="mb-3 text-center hidden">
+              <img id="soal-image" src="" class="img-fluid rounded border shadow-sm" style="max-height: 250px;">
+            </div>
+            <div class="soal-text fw-semibold text-dark mb-4" id="soal-body">Memuat teks pertanyaan...</div>
+            <div id="options-block">
+              <div class="option-container" onclick="selectOption('A')"><input type="radio" name="answer" id="opt-A" value="A"><span id="text-opt-A">Opsi A</span></div>
+              <div class="option-container" onclick="selectOption('B')"><input type="radio" name="answer" id="opt-B" value="B"><span id="text-opt-B">Opsi B</span></div>
+              <div class="option-container" onclick="selectOption('C')"><input type="radio" name="answer" id="opt-C" value="C"><span id="text-opt-C">Opsi C</span></div>
+              <div class="option-container" onclick="selectOption('D')"><input type="radio" name="answer" id="opt-D" value="D"><span id="text-opt-D">Opsi D</span></div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
+            <button class="btn btn-outline-secondary fw-bold px-4" id="btn-prev" onclick="prevQuestion()">Sebelumnya</button>
+            <button class="btn btn-warning fw-bold px-4" id="btn-doubt" onclick="toggleDoubtful()">Ragu-Ragu</button>
+            <button class="btn btn-primary fw-bold px-4" id="btn-next" onclick="nextQuestion()">Selanjutnya</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card p-4">
+          <h5 class="fw-bold mb-3 text-dark text-center">Nomor Soal</h5>
+          <div id="question-grid" class="text-center mb-4" style="max-height: 250px; overflow-y: auto;"></div>
+          <hr>
+          <div class="d-flex flex-wrap gap-2 justify-content-center mb-4 text-xs">
+            <span class="badge bg-success p-2">Sudah Dijawab</span>
+            <span class="badge bg-warning text-dark p-2">Ragu-Ragu</span>
+            <span class="badge bg-white text-dark border p-2">Belum Dijawab</span>
+          </div>
+          <button onclick="confirmSubmit()" class="btn btn-danger btn-lg w-100 fw-bold">Selesai & Kirim Ujian</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HALAMAN SELESAI -->
+    <div id="finish-page" class="row justify-content-center hidden">
+      <div class="col-md-6 text-center">
+        <div class="card p-5">
+          <div class="card-body">
+            <span style="font-size: 5rem;">🎉</span>
+            <h2 class="fw-bold text-success mb-3">Ujian Selesai!</h2>
+            <p class="text-muted mb-4">Terima kasih, jawaban Anda telah dikunci dan dikirim secara aman ke server panitia.</p>
+            <div class="alert alert-info py-3 fw-bold fs-5">Skor Anda Berhasil Direkam!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // URL Web App Resmi
+    const API_URL = "https://script.google.com/macros/s/AKfycbxMaojCBvW4q4wFaDOe7jlbjCTfJajgLvqAPwKIDZMkRKZJNtkOSzOkVhbw_6I3PFPYrw/exec";
+    
+    var EXAM_DURATION_MINUTES = 30; 
+    var questions = []; var currentIdx = 0; var userAnswers = {}; var doubtfulSoal = {}; var participantData = {};
+    var timeRemaining = EXAM_DURATION_MINUTES * 60; var totalTimeSpent = 0; var timerInterval;
+
+    function callBackend(data, callback, fallback) {
+      fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => callback(res))
+      .catch(err => { if(fallback) fallback(err); else alert("Koneksi bermasalah: " + err); });
+    }
+
+    function validateAndStart() {
+      var no = document.getElementById('no-peserta').value.trim();
+      var nama = document.getElementById('nama-peserta').value.trim();
+      var sekolah = document.getElementById('asal-sekolah').value.trim();
+      
+      if (!no || !nama || !sekolah) { alert("Harap lengkapi semua data sebelum memulai!"); return; }
+      
+      document.getElementById('login-page').classList.add('hidden');
+      document.getElementById('header-lomba').classList.add('hidden'); // Sembunyikan header saat ujian
+      document.getElementById('loading-text').innerText = "Memvalidasi Nomor Peserta...";
+      document.getElementById('loading-page').classList.remove('hidden');
+
+      callBackend({ action: 'registerParticipant', noPeserta: no, namaPeserta: nama, asalSekolah: sekolah }, function(res) {
+        if (res.success) {
+          participantData = { noPeserta: no, namaPeserta: nama, asalSekolah: sekolah };
+          document.getElementById('loading-text').innerText = "Berhasil! Sedang memuat soal...";
+          loadQuestionsFromServer();
+        } else {
+          document.getElementById('loading-page').classList.add('hidden');
+          document.getElementById('login-page').classList.remove('hidden');
+          document.getElementById('header-lomba').classList.remove('hidden');
+          alert(res.message);
+        }
+      });
+    }
+
+    function loadQuestionsFromServer() {
+      callBackend({ action: 'getQuestions' }, function(res) {
+        questions = res.questions;
+        if (!questions || questions.length === 0) { alert("Bank Soal kosong!"); return; }
+        document.getElementById('loading-page').classList.add('hidden');
+        document.getElementById('exam-page').classList.remove('hidden');
+        buildGrid(); showQuestion(0); startTimer(); syncLiveProgress();
+      });
+    }
+
+    function buildGrid() {
+      var grid = document.getElementById('question-grid'); grid.innerHTML = "";
+      questions.forEach(function(q, index) {
+        var box = document.createElement('div'); box.className = "nav-box"; box.id = "grid-box-" + index;
+        box.innerText = index + 1; box.onclick = function() { jumpToQuestion(index); }; grid.appendChild(box);
+      });
+    }
+
+    function showQuestion(index) {
+      if (index < 0 || index >= questions.length) return;
+      document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('current'));
+      document.getElementById('grid-box-' + index).classList.add('current');
+      currentIdx = index; var q = questions[index];
+      
+      document.getElementById('soal-title').innerText = "Soal No. " + q.no;
+      document.getElementById('soal-body').innerText = q.teks;
+      
+      var imgCont = document.getElementById('image-container'); var imgEl = document.getElementById('soal-image');
+      if (q.gambar && q.gambar.trim() !== "") { imgEl.src = q.gambar.trim(); imgCont.classList.remove('hidden'); } else { imgCont.classList.add('hidden'); }
+      
+      document.getElementById('text-opt-A').innerText = q.opsiA; document.getElementById('text-opt-B').innerText = q.opsiB;
+      document.getElementById('text-opt-C').innerText = q.opsiC; document.getElementById('text-opt-D').innerText = q.opsiD;
+      
+      document.querySelectorAll('.option-container').forEach(el => el.classList.remove('selected'));
+      document.getElementsByName('answer').forEach(r => r.checked = false);
+      
+      var savedAns = userAnswers[q.no];
+      if (savedAns) {
+        var targetRadio = document.getElementById('opt-' + savedAns);
+        if (targetRadio) { targetRadio.checked = true; targetRadio.closest('.option-container').classList.add('selected'); }
+      }
+      document.getElementById('btn-prev').disabled = (index === 0);
+      if (index === questions.length - 1) {
+        document.getElementById('btn-next').innerText = "Selesai"; document.getElementById('btn-next').classList.replace('btn-primary', 'btn-success');
+      } else {
+        document.getElementById('btn-next').innerText = "Selanjutnya"; document.getElementById('btn-next').classList.replace('btn-success', 'btn-primary');
+      }
+    }
+
+    function selectOption(letter) {
+      var q = questions[currentIdx]; userAnswers[q.no] = letter;
+      document.querySelectorAll('.option-container').forEach(el => el.classList.remove('selected'));
+      var radio = document.getElementById('opt-' + letter); radio.checked = true; radio.closest('.option-container').classList.add('selected');
+      updateGridStatus(currentIdx, q.no); syncLiveProgress();
+    }
+
+    function syncLiveProgress() { callBackend({ action: 'saveLiveProgress', participantData: participantData, userAnswers: userAnswers }, function(){}); }
+    function toggleDoubtful() { var q = questions[currentIdx]; doubtfulSoal[q.no] = !doubtfulSoal[q.no]; showQuestion(currentIdx); updateGridStatus(currentIdx, q.no); }
+    function updateGridStatus(idx, qNo) {
+      var box = document.getElementById('grid-box-' + idx); box.className = "nav-box";
+      if (currentIdx === idx) box.classList.add('current');
+      if (doubtfulSoal[qNo]) { box.classList.add('doubtful'); } else if (userAnswers[qNo]) { box.classList.add('answered'); }
+    }
+
+    function nextQuestion() { if (currentIdx === questions.length - 1) { confirmSubmit(); } else { showQuestion(currentIdx + 1); } }
+    function prevQuestion() { showQuestion(currentIdx - 1); }
+    function jumpToQuestion(idx) { showQuestion(idx); }
+
+    function startTimer() {
+      timerInterval = setInterval(function() {
+        timeRemaining--; totalTimeSpent++;
+        var mins = Math.floor(timeRemaining / 60); var secs = timeRemaining % 60;
+        document.getElementById('timer-display').innerText = (mins < 10 ? "0" + mins : mins) + ":" + (secs < 10 ? "0" + secs : secs);
+        if (timeRemaining <= 0) { clearInterval(timerInterval); alert("Waktu habis! Jawaban Anda otomatis dikunci."); executeSubmit(); }
+      }, 1000);
+    }
+
+    function confirmSubmit() { if (confirm("Apakah Anda yakin ingin menyelesaikan ujian?")) { clearInterval(timerInterval); executeSubmit(); } }
+
+    function executeSubmit() {
+      document.getElementById('exam-page').classList.add('hidden');
+      document.getElementById('loading-text').innerText = "Mengirim & Mengunci Nilai Akhir Anda...";
+      document.getElementById('loading-page').classList.remove('hidden');
+      
+      callBackend({ action: 'submitAnswers', participantData: participantData, userAnswers: userAnswers, totalTimeInSeconds: totalTimeSpent }, function() {
+        document.getElementById('loading-page').classList.add('hidden');
+        document.getElementById('finish-page').classList.remove('hidden');
+      });
+    }
+  </script>
+</body>
+</html>
