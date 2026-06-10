@@ -8,6 +8,15 @@
   <style>
     body { background-color: #f4f6f9; font-family: 'Segoe UI', Arial, sans-serif; }
     .card { border-radius: 12px; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    
+    /* Desain Logo Bulat Presisi */
+    .logo-circle {
+      width: 75px; height: 75px; border-radius: 50%; overflow: hidden;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: #fff; border: 3px solid #0d6efd; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+    .logo-circle img { width: 100%; height: 100%; object-fit: cover; }
+
     .nav-box { width: 42px; height: 42px; line-height: 40px; text-align: center; border: 1px solid #ced4da; border-radius: 8px; cursor: pointer; font-weight: 600; margin: 5px; display: inline-block; background-color: #fff; transition: all 0.2s; }
     .nav-box.answered { background-color: #198754; color: #fff; border-color: #198754; }
     .nav-box.doubtful { background-color: #ffc107; color: #000; border-color: #ffc107; }
@@ -23,10 +32,10 @@
 </head>
 <body>
 
-  <!-- KOP HEADER INDEX -->
+  <!-- KOP HEADER INDEX (LOGO BULAT DI KIRI) -->
   <div class="container mt-4 mb-3 d-flex align-items-center justify-content-center gap-3" id="header-lomba">
-    <img src="logo.png" alt="Logo Kiri" style="height: 70px;">
-    <h1 class="fw-bold m-0 text-primary" style="letter-spacing: 1px;">HUT SPENSANECI 57</h1>
+    <div class="logo-circle"><img src="logo.png" alt="Logo Kiri"></div>
+    <h1 class="fw-bold m-0 text-primary" style="letter-spacing: 1px;">SEMARAK SPENSANECI 57</h1>
   </div>
 
   <div class="container my-4">
@@ -35,8 +44,8 @@
       <div class="col-md-6">
         <div class="card p-4 border-top border-primary border-4">
           <div class="card-body text-center">
-            <!-- LOGO 2 DI ATAS LOGIN -->
-            <img src="logo2.png" alt="Logo Atas Login" class="mb-3" style="height: 80px;">
+            <!-- LOGO 2 BULAT DI ATAS LOGIN -->
+            <div class="logo-circle mb-3" style="width: 85px; height: 85px; border-color: #ffc107;"><img src="logo2.png" alt="Logo Atas Login"></div>
             <h3 class="mb-4 fw-bold text-dark">Login Peserta Ujian</h3>
             
             <div class="text-start">
@@ -62,7 +71,7 @@
     <!-- HALAMAN LOADING -->
     <div id="loading-page" class="text-center hidden my-5">
       <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
-      <h5 class="mt-3 text-muted fw-semibold" id="loading-text">Memproses pendaftaran... Harap tunggu.</h5>
+      <h5 class="mt-3 text-muted fw-semibold" id="loading-text">Memproses... Harap tunggu.</h5>
     </div>
 
     <!-- HALAMAN RUANG UJIAN -->
@@ -72,7 +81,7 @@
           <div>
             <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
               <h4 class="fw-bold text-secondary" id="soal-title">Soal No. 1</h4>
-              <div class="timer" id="timer-display">00:00</div>
+              <div class="timer" id="timer-display">90:00</div>
             </div>
             <div id="image-container" class="mb-3 text-center hidden">
               <img id="soal-image" src="" class="img-fluid rounded border shadow-sm" style="max-height: 250px;">
@@ -123,21 +132,39 @@
   </div>
 
   <script>
-    // URL Web App Resmi
     const API_URL = "https://script.google.com/macros/s/AKfycbxMaojCBvW4q4wFaDOe7jlbjCTfJajgLvqAPwKIDZMkRKZJNtkOSzOkVhbw_6I3PFPYrw/exec";
     
-    var EXAM_DURATION_MINUTES = 30; 
+    var EXAM_DURATION_MINUTES = 90; // Diubah ke 90 Menit
     var questions = []; var currentIdx = 0; var userAnswers = {}; var doubtfulSoal = {}; var participantData = {};
     var timeRemaining = EXAM_DURATION_MINUTES * 60; var totalTimeSpent = 0; var timerInterval;
 
+    window.addEventListener('DOMContentLoaded', function() {
+      checkSavedSession();
+    });
+
+    function checkSavedSession() {
+      if (localStorage.getItem('spensaneci_exam_active') === 'true') {
+        participantData = JSON.parse(localStorage.getItem('spensaneci_partData'));
+        userAnswers = JSON.parse(localStorage.getItem('spensaneci_answers')) || {};
+        doubtfulSoal = JSON.parse(localStorage.getItem('spensaneci_doubtful')) || {};
+        currentIdx = parseInt(localStorage.getItem('spensaneci_currentIdx')) || 0;
+        timeRemaining = parseInt(localStorage.getItem('spensaneci_timeRemaining'));
+        totalTimeSpent = parseInt(localStorage.getItem('spensaneci_totalTimeSpent')) || 0;
+
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('header-lomba').classList.add('hidden');
+        document.getElementById('loading-text').innerText = "Memulihkan sesi terakhir Anda... Harap tunggu.";
+        document.getElementById('loading-page').classList.remove('hidden');
+        
+        loadQuestionsFromServer(true);
+      }
+    }
+
     function callBackend(data, callback, fallback) {
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
+      fetch(API_URL, { method: 'POST', body: JSON.stringify(data) })
       .then(res => res.json())
       .then(res => callback(res))
-      .catch(err => { if(fallback) fallback(err); else alert("Koneksi bermasalah: " + err); });
+      .catch(err => { if(fallback) fallback(err); else console.log("Koneksi bermasalah: " + err); });
     }
 
     function validateAndStart() {
@@ -148,15 +175,23 @@
       if (!no || !nama || !sekolah) { alert("Harap lengkapi semua data sebelum memulai!"); return; }
       
       document.getElementById('login-page').classList.add('hidden');
-      document.getElementById('header-lomba').classList.add('hidden'); // Sembunyikan header saat ujian
+      document.getElementById('header-lomba').classList.add('hidden');
       document.getElementById('loading-text').innerText = "Memvalidasi Nomor Peserta...";
       document.getElementById('loading-page').classList.remove('hidden');
 
       callBackend({ action: 'registerParticipant', noPeserta: no, namaPeserta: nama, asalSekolah: sekolah }, function(res) {
         if (res.success) {
           participantData = { noPeserta: no, namaPeserta: nama, asalSekolah: sekolah };
-          document.getElementById('loading-text').innerText = "Berhasil! Sedang memuat soal...";
-          loadQuestionsFromServer();
+          
+          localStorage.setItem('spensaneci_exam_active', 'true');
+          localStorage.setItem('spensaneci_partData', JSON.stringify(participantData));
+          localStorage.setItem('spensaneci_timeRemaining', EXAM_DURATION_MINUTES * 60);
+          localStorage.setItem('spensaneci_totalTimeSpent', 0);
+          localStorage.setItem('spensaneci_currentIdx', 0);
+          localStorage.setItem('spensaneci_answers', JSON.stringify({}));
+          localStorage.setItem('spensaneci_doubtful', JSON.stringify({}));
+
+          loadQuestionsFromServer(false);
         } else {
           document.getElementById('loading-page').classList.add('hidden');
           document.getElementById('login-page').classList.remove('hidden');
@@ -166,13 +201,16 @@
       });
     }
 
-    function loadQuestionsFromServer() {
+    function loadQuestionsFromServer(isResume) {
       callBackend({ action: 'getQuestions' }, function(res) {
         questions = res.questions;
         if (!questions || questions.length === 0) { alert("Bank Soal kosong!"); return; }
         document.getElementById('loading-page').classList.add('hidden');
         document.getElementById('exam-page').classList.remove('hidden');
-        buildGrid(); showQuestion(0); startTimer(); syncLiveProgress();
+        buildGrid();
+        showQuestion(currentIdx);
+        startTimer();
+        if(!isResume) { syncLiveProgress(); }
       });
     }
 
@@ -181,14 +219,19 @@
       questions.forEach(function(q, index) {
         var box = document.createElement('div'); box.className = "nav-box"; box.id = "grid-box-" + index;
         box.innerText = index + 1; box.onclick = function() { jumpToQuestion(index); }; grid.appendChild(box);
+        updateGridStatus(index, q.no);
       });
     }
 
     function showQuestion(index) {
       if (index < 0 || index >= questions.length) return;
       document.querySelectorAll('.nav-box').forEach(el => el.classList.remove('current'));
-      document.getElementById('grid-box-' + index).classList.add('current');
-      currentIdx = index; var q = questions[index];
+      var currentBox = document.getElementById('grid-box-' + index);
+      if(currentBox) currentBox.classList.add('current');
+      
+      currentIdx = index;
+      localStorage.setItem('spensaneci_currentIdx', currentIdx);
+      var q = questions[index];
       
       document.getElementById('soal-title').innerText = "Soal No. " + q.no;
       document.getElementById('soal-body').innerText = q.teks;
@@ -217,15 +260,25 @@
 
     function selectOption(letter) {
       var q = questions[currentIdx]; userAnswers[q.no] = letter;
+      localStorage.setItem('spensaneci_answers', JSON.stringify(userAnswers));
+      
       document.querySelectorAll('.option-container').forEach(el => el.classList.remove('selected'));
       var radio = document.getElementById('opt-' + letter); radio.checked = true; radio.closest('.option-container').classList.add('selected');
-      updateGridStatus(currentIdx, q.no); syncLiveProgress();
+      updateGridStatus(currentIdx, q.no); 
+      syncLiveProgress();
     }
 
     function syncLiveProgress() { callBackend({ action: 'saveLiveProgress', participantData: participantData, userAnswers: userAnswers }, function(){}); }
-    function toggleDoubtful() { var q = questions[currentIdx]; doubtfulSoal[q.no] = !doubtfulSoal[q.no]; showQuestion(currentIdx); updateGridStatus(currentIdx, q.no); }
+    function toggleDoubtful() { 
+      var q = questions[currentIdx]; doubtfulSoal[q.no] = !doubtfulSoal[q.no]; 
+      localStorage.setItem('spensaneci_doubtful', JSON.stringify(doubtfulSoal));
+      showQuestion(currentIdx); updateGridStatus(currentIdx, q.no); 
+    }
+    
     function updateGridStatus(idx, qNo) {
-      var box = document.getElementById('grid-box-' + idx); box.className = "nav-box";
+      var box = document.getElementById('grid-box-' + idx); 
+      if(!box) return;
+      box.className = "nav-box";
       if (currentIdx === idx) box.classList.add('current');
       if (doubtfulSoal[qNo]) { box.classList.add('doubtful'); } else if (userAnswers[qNo]) { box.classList.add('answered'); }
     }
@@ -235,8 +288,13 @@
     function jumpToQuestion(idx) { showQuestion(idx); }
 
     function startTimer() {
+      clearInterval(timerInterval);
       timerInterval = setInterval(function() {
         timeRemaining--; totalTimeSpent++;
+        
+        localStorage.setItem('spensaneci_timeRemaining', timeRemaining);
+        localStorage.setItem('spensaneci_totalTimeSpent', totalTimeSpent);
+
         var mins = Math.floor(timeRemaining / 60); var secs = timeRemaining % 60;
         document.getElementById('timer-display').innerText = (mins < 10 ? "0" + mins : mins) + ":" + (secs < 10 ? "0" + secs : secs);
         if (timeRemaining <= 0) { clearInterval(timerInterval); alert("Waktu habis! Jawaban Anda otomatis dikunci."); executeSubmit(); }
@@ -251,6 +309,7 @@
       document.getElementById('loading-page').classList.remove('hidden');
       
       callBackend({ action: 'submitAnswers', participantData: participantData, userAnswers: userAnswers, totalTimeInSeconds: totalTimeSpent }, function() {
+        localStorage.clear(); // Bersihkan pelacak jika sukses terkirim resmi
         document.getElementById('loading-page').classList.add('hidden');
         document.getElementById('finish-page').classList.remove('hidden');
       });
