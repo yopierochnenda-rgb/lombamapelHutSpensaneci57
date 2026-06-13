@@ -76,7 +76,7 @@
       display: flex;
       padding: 20px;
       gap: 20px;
-      overflow: hidden; /* Mengunci konten agar tidak menjebol ke bawah */
+      overflow: hidden; 
     }
 
     /* PANEL KIRI: Tempat Soal Aktif */
@@ -91,7 +91,7 @@
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
     
-    /* Box Teks Soal & Opsi (Hanya area ini yang boleh scroll jika soalnya kepanjangan) */
+    /* Box Teks Soal & Opsi */
     .cat-question-content {
       flex: 1;
       overflow-y: auto;
@@ -122,7 +122,7 @@
     .option-item input { transform: scale(1.2); margin-right: 15px; cursor: pointer; }
     .option-item.selected { background: #eff6ff; border-color: #3b82f6; color: #1e40af; font-weight: 600; box-shadow: 0 0 0 1px #3b82f6; }
 
-    /* Tombol Navigasi Bawah (Mempunyai posisi fix terkunci di bawah panel) */
+    /* Tombol Navigasi Bawah */
     .cat-question-footer {
       height: 75px;
       border-top: 1px solid #e2e8f0;
@@ -134,7 +134,7 @@
       flex-shrink: 0;
     }
 
-    /* PANEL KANAN: Navigasi Nomor (Fix Terkunci di Samping) */
+    /* PANEL KANAN: Navigasi Nomor */
     .cat-right-panel {
       width: 360px;
       background: white;
@@ -149,7 +149,7 @@
 
     .cat-grid-wrapper {
       flex: 1;
-      overflow-y: auto; /* Grid nomor akan scroll internal jika nomor sangat banyak */
+      overflow-y: auto; 
       padding-right: 5px;
     }
 
@@ -191,20 +191,18 @@
       
       <div class="text-start mb-3">
         <label class="form-label small fw-bold text-secondary">Nomor Ujian Peserta</label>
-        <div class="input-group">
-          <input type="text" id="no-peserta" class="form-control form-control-lg text-center fw-bold" style="text-transform: uppercase;" placeholder="Contoh: SN-001" autocomplete="off">
-          <button class="btn btn-dark fw-bold px-3" type="button" id="btn-cek" onclick="cekNomorPeserta()">CEK NOMOR</button>
-        </div>
+        <input type="text" id="no-peserta" class="form-control form-control-lg text-center fw-bold fs-4" style="text-transform: uppercase; letter-spacing: 2px;" placeholder="Ketik Nomor Ujian..." autocomplete="off">
+        <div id="status-ketik" class="small mt-1 fw-bold text-muted text-center d-none"></div>
       </div>
       
       <form id="form-login" onsubmit="handleLogin(event)">
         <div class="text-start mb-3">
           <label class="form-label small fw-bold text-secondary">Nama Lengkap Peserta</label>
-          <input type="text" id="nama-peserta" class="form-control form-control-lg bg-light fw-semibold text-muted" placeholder="Akan terisi otomatis" readonly required>
+          <input type="text" id="nama-peserta" class="form-control form-control-lg bg-light fw-semibold text-muted" placeholder="Akan muncul otomatis..." readonly required>
         </div>
         <div class="text-start mb-4">
           <label class="form-label small fw-bold text-secondary">Asal Sekolah</label>
-          <input type="text" id="asal-sekolah" class="form-control form-control-lg bg-light fw-semibold text-muted" placeholder="Akan terisi otomatis" readonly required>
+          <input type="text" id="asal-sekolah" class="form-control form-control-lg bg-light fw-semibold text-muted" placeholder="Akan muncul otomatis..." readonly required>
         </div>
         <button type="submit" id="btn-masuk" class="btn btn-primary btn-lg w-100 fw-bold shadow" disabled>MASUK RUANG UJIAN</button>
       </form>
@@ -212,7 +210,6 @@
   </div>
 
   <div id="exam-page">
-    
     <header class="cat-header shadow-sm bg-white">
       <div class="w-100 d-flex justify-content-between align-items-center">
         <div>
@@ -230,35 +227,28 @@
     </header>
 
     <div class="cat-workspace">
-      
       <div class="cat-left-panel" id="container-soal-tunggal">
         <div class="text-center py-5 text-muted">Memuat data ruang ujian...</div>
       </div>
       
       <div class="cat-right-panel">
         <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">NAVIGASI NOMOR SOAL</h6>
-        
         <div class="cat-grid-wrapper">
-          <div class="grid-nomor" id="grid-navigasi-nomor">
-            </div>
+          <div class="grid-nomor" id="grid-navigasi-nomor"></div>
         </div>
-        
         <hr class="my-3 flex-shrink-0">
-        
         <div class="d-flex justify-content-between text-center small fw-semibold text-muted mb-3 flex-shrink-0">
           <div><span class="badge bg-primary px-2 py-1 mb-1 d-block">&nbsp;</span>Posisi</div>
           <div><span class="badge bg-success px-2 py-1 mb-1 d-block">&nbsp;</span>Terjawab</div>
           <div><span class="badge bg-white text-dark border px-2 py-1 mb-1 d-block">&nbsp;</span>Kosong</div>
         </div>
-        
         <button type="button" onclick="confirmSubmit()" id="btn-submit-final" class="btn btn-danger w-100 fw-bold py-2 shadow-sm flex-shrink-0">AKHIRI UJIAN</button>
       </div>
-
     </div>
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzPhMfO-VBPw4I-PWNql5x8HWLNckVFxnD7DB1eJlMCL1M8iCVEYiDnHaHjFlwU4E7qPQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbw6iUsySZVMRFgn-eCqDY7aYTfypTBbQlOnuImhlvbSdKqfdMmyJRPIfYDauKOORQLw/exec";
 
     let participantData = {};
     let userAnswers = {};
@@ -267,13 +257,76 @@
     let timerInterval;
     const DURASI_UJIAN_DETIK = 5400; // 90 Menit
 
-    function cekNomorPeserta() {
-      const noInput = document.getElementById('no-peserta').value.trim();
-      const btnCek = document.getElementById('btn-cek');
-      if(!noInput) { alert("Masukkan nomor ujian terlebih dahulu!"); return; }
+    let mengetikTimer;
+    const jedaTungguKetik = 500; 
+    const inputNoPeserta = document.getElementById('no-peserta');
+    const statusKetik = document.getElementById('status-ketik');
+
+    // CHEK AUTOMATIS JIKA PENGGUNA SUDAH LOGIN SEBELUMNYA (ANTI-REFRESH)
+    window.addEventListener('DOMContentLoaded', () => {
+      const sessionActive = localStorage.getItem('cat_session_active');
+      const savedData = localStorage.getItem('cat_participant_data');
       
-      btnCek.innerText = "Mengecek...";
-      btnCek.disabled = true;
+      if (sessionActive === 'true' && savedData) {
+        participantData = JSON.parse(savedData);
+        
+        // Langsung bypass, ambil soal, dan mulai ujian tanpa form login
+        document.getElementById('login-page').style.setProperty('display', 'none', 'important');
+        document.getElementById('exam-page').style.display = 'flex';
+        
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getQuestions' }) })
+        .then(res => res.json())
+        .then(res => {
+          if (res.success) {
+            questionsList = res.questions;
+            startExam(true); // true = bypass login status ke server
+          } else {
+            alert("Gagal mengambil file bank soal.");
+            resetSessionForce();
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Gagal memuat ulang sesi ujian. Coba refresh kembali.");
+        });
+      }
+    });
+
+    function resetSessionForce() {
+      localStorage.clear();
+      window.location.reload();
+    }
+
+    inputNoPeserta.addEventListener('input', function() {
+      clearTimeout(mengetikTimer);
+      const nilaiInput = inputNoPeserta.value.trim();
+
+      if (!nilaiInput) {
+        statusKetik.classList.add('d-none');
+        resetFormLogin();
+        return;
+      }
+
+      statusKetik.classList.remove('d-none');
+      statusKetik.className = "small mt-1 fw-bold text-warning text-center";
+      statusKetik.innerText = "⏳ Sedang mengetik...";
+      resetFormLogin();
+
+      mengetikTimer = setTimeout(cekNomorOtomatis, jedaTungguKetik);
+    });
+
+    function resetFormLogin() {
+      document.getElementById('nama-peserta').value = "";
+      document.getElementById('asal-sekolah').value = "";
+      document.getElementById('btn-masuk').disabled = true;
+    }
+
+    function cekNomorOtomatis() {
+      const noInput = inputNoPeserta.value.trim();
+      if (!noInput) return;
+
+      statusKetik.className = "small mt-1 fw-bold text-primary text-center";
+      statusKetik.innerText = "🔍 Mencari nomor di server...";
 
       fetch(API_URL, {
         method: 'POST',
@@ -285,9 +338,9 @@
           document.getElementById('nama-peserta').value = res.namaPeserta;
           document.getElementById('asal-sekolah').value = res.asalSekolah;
           document.getElementById('btn-masuk').disabled = false;
-          document.getElementById('no-peserta').readOnly = true;
-          btnCek.innerText = "✓ VALID";
-          btnCek.className = "btn btn-success fw-bold px-3";
+          
+          statusKetik.className = "small mt-1 fw-bold text-success text-center";
+          statusKetik.innerText = "✅ Nomor Ditemukan!";
           
           participantData = {
             noPeserta: noInput,
@@ -295,16 +348,15 @@
             asalSekolah: res.asalSekolah
           };
         } else {
-          alert(res.message);
-          btnCek.innerText = "CEK NOMOR";
-          btnCek.disabled = false;
+          statusKetik.className = "small mt-1 fw-bold text-danger text-center";
+          statusKetik.innerText = "❌ Nomor tidak terdaftar!";
+          resetFormLogin();
         }
       })
       .catch(err => {
         console.error(err);
-        alert("Error koneksi jaringan. Coba lagi.");
-        btnCek.innerText = "CEK NOMOR";
-        btnCek.disabled = false;
+        statusKetik.className = "small mt-1 fw-bold text-danger text-center";
+        statusKetik.innerText = "⚠️ Gangguan Jaringan!";
       });
     }
 
@@ -325,8 +377,16 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
+          // Kunci status sesi aktif di lokal komputer siswa
+          localStorage.setItem('cat_session_active', 'true');
+          localStorage.setItem('cat_participant_data', JSON.stringify(participantData));
+          
           questionsList = res.questions;
-          startExam();
+          
+          document.getElementById('login-page').style.setProperty('display', 'none', 'important');
+          document.getElementById('exam-page').style.display = 'flex';
+          
+          startExam(false);
         } else { 
           alert("Gagal mengambil file bank soal."); 
           btn.innerText = "MASUK RUANG UJIAN"; 
@@ -341,9 +401,7 @@
       });
     }
 
-    function startExam() {
-      document.getElementById('login-page').style.setProperty('display', 'none', 'important');
-      document.getElementById('exam-page').style.display = 'flex';
+    function startExam(isBypassed) {
       document.getElementById('display-nama').innerText = participantData.namaPeserta + " (" + participantData.asalSekolah + ")";
       
       const savedAnswers = localStorage.getItem('cat_answers_' + participantData.noPeserta);
@@ -535,8 +593,9 @@
       .then(res => { 
         if(res.success) { 
           alert("Ujian selesai! Jawaban Anda telah berhasil dikunci."); 
-          localStorage.removeItem('cat_answers_' + participantData.noPeserta);
-          localStorage.removeItem('cat_endTime_' + participantData.noPeserta);
+          
+          // BERSIHKAN STATUS SESI KETIKA SELESAI SECARA RESMI
+          localStorage.clear();
           window.location.reload(); 
         } 
       })
