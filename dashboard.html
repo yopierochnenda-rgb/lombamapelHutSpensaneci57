@@ -8,8 +8,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   
   <style>
-    /* Mengubah Background Utama Menjadi Putih/Abu-abu Terang Bersih */
-    body { background-color: #f8fafc; color: #1e293b; font-family: 'Segoe UI', sans-serif; }
+    /* Mengubah Background Utama Menjadi Putih/Abu-abu Terang Bersih dengan Background Transparan */
+    body { 
+      background: linear-gradient(rgba(241, 245, 249, 0.93), rgba(241, 245, 249, 0.93)), url('bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #1e293b; 
+      font-family: 'Segoe UI', sans-serif; 
+    }
     
     /* Desain Logo Bulat Presisi */
     .logo-circle-dash {
@@ -19,8 +24,14 @@
     }
     .logo-circle-dash img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* Desain Tabel Mode Terang (High Contrast) */
-    .table-light-custom { background-color: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+    /* Desain Tabel Mode Terang (High Contrast) dengan Efek Sedikit Transparan Mewah */
+    .table-light-custom { 
+      background: rgba(255, 255, 255, 0.97); 
+      backdrop-filter: blur(10px);
+      border-radius: 12px; 
+      overflow: hidden; 
+      border: 1px solid #e2e8f0; 
+    }
     .table-light-custom th { background-color: #0d6efd; color: #ffffff; font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border: none; padding: 15px; }
     .table-light-custom td { padding: 15px; vertical-align: middle; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 0.95rem; }
     .table-light-custom tbody tr:hover { background-color: #f1f5f9; }
@@ -36,14 +47,19 @@
     .status-selesai { background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
     .status-kerja { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
     
-    /* Panel Header Atas Berlatar Putih Gading Minimalis */
-    .header-panel { background: #ffffff; border-bottom: 3px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    /* Panel Header Atas Berlatar Putih Gading Minimalis Transparan */
+    .header-panel { 
+      background: rgba(255, 255, 255, 0.95); 
+      backdrop-filter: blur(5px);
+      border-bottom: 3px solid #e2e8f0; 
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
+    }
     
     /* Efek Pulse Sinkronisasi Data */
     .sync-loader { display: inline-block; width: 10px; height: 10px; background-color: #0d6efd; border-radius: 50%; animation: pulse-anim 1.5s infinite ease-in-out; margin-right: 8px; }
     @keyframes pulse-anim { 0%, 100% { transform: scale(0.6); opacity: 0.4; } 50% { transform: scale(1.2); opacity: 1; } }
 
-    /* Styling Cetak PDF Berita Acara (Tetap Standar A4 Resmi) */
+    /* Styling Cetak PDF Berita Acara (Tetap Standar A4 Resmi Tanpa Background Gambar) */
     #pdf-container { display: none; }
     .a4-print-box { width: 210mm; min-height: 297mm; padding: 20mm; background: white; color: black; font-family: 'Times New Roman', Times, serif; box-sizing: border-box; }
     .kop-surat { border-bottom: 4px solid black; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; text-align: center; }
@@ -59,7 +75,7 @@
 </head>
 <body>
 
-  <!-- HEADER DASHBOARD LIVE SCORE (KINI PUTIH & BERSIH) -->
+  <!-- HEADER DASHBOARD LIVE SCORE (KINI PUTIH, BERSIH, DAN TRANSPARAN) -->
   <div class="header-panel py-4 mb-4">
     <div class="container d-flex justify-content-between align-items-center mb-3">
       <div class="logo-circle-dash"><img src="logo.png" alt="Logo Kiri"></div>
@@ -138,7 +154,7 @@
       </table>
 
       <p style="text-align: justify; font-size: 16px; line-height: 1.6;">
-        Demikian berita acara hasil perlombaan ini diterbitkan secara sah, bersifat mengikat, dan tidak dapat diganggu gugat.
+        Demikian berita acara hasil perlombaan ini diterbitkan secara sah, bersifat mengikat, and tidak dapat diganggu gugat.
       </p>
 
       <div class="ttd-box">
@@ -159,7 +175,7 @@
   </div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzPhMfO-VBPw4I-PWNql5x8HWLNckVFxnD7DB1eJlMCL1M8iCVEYiDnHaHjFlwU4E7qPQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbw6iUsySZVMRFgn-eCqDY7aYTfypTBbQlOnuImhlvbSdKqfdMmyJRPIfYDauKOORQLw/exec";
 
     function fetchLiveScore() {
       fetch(API_URL, {
