@@ -6,13 +6,14 @@
   <title>Sistem Ujian CAT - SEMARAK SPENSANECI</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    /* KUNCI UTAMA: Matikan scroll browser secara total */
+    /* KUNCI UTAMA: Matikan scroll browser secara total dan pasang BG bg.jpg */
     html, body { 
       height: 100%; 
       margin: 0; 
       padding: 0; 
       overflow: hidden; 
-      background-color: #f1f5f9; 
+      background: linear-gradient(rgba(241, 245, 249, 0.93), rgba(241, 245, 249, 0.93)), url('bg.jpg') no-repeat center center fixed;
+      background-size: cover;
       color: #334155; 
       font-family: 'Segoe UI', sans-serif; 
     }
@@ -28,7 +29,8 @@
       border: none; 
       border-radius: 16px; 
       box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
-      background: #ffffff; 
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
     }
     .logo-container { 
       width: 70px; 
@@ -43,7 +45,7 @@
     }
     .logo-container img { width: 100%; height: 100%; object-fit: cover; }
 
-    /* LAYOUT UTAMA CAT (ANTI-SCROLL HALAMAN) */
+    /* LAYOUT UTAMA CAT */
     #exam-page { 
       height: 100vh; 
       display: none; 
@@ -52,7 +54,8 @@
     
     .cat-header { 
       height: 75px; 
-      background: #ffffff; 
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(5px);
       border-bottom: 2px solid #e2e8f0; 
       display: flex; 
       align-items: center;
@@ -70,7 +73,6 @@
       border: 1px solid #fca5a5; 
     }
 
-    /* Pembagian Ruang Panel Kiri & Kanan */
     .cat-workspace {
       flex: 1;
       display: flex;
@@ -79,19 +81,18 @@
       overflow: hidden; 
     }
 
-    /* PANEL KIRI: Tempat Soal Aktif */
     .cat-left-panel {
       flex: 1;
       display: flex;
       flex-direction: column;
-      background: white;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(5px);
       border-radius: 12px;
       border: 1px solid #e2e8f0;
       overflow: hidden;
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
     }
     
-    /* Box Teks Soal & Opsi */
     .cat-question-content {
       flex: 1;
       overflow-y: auto;
@@ -110,7 +111,7 @@
     .option-item { 
       display: flex; 
       align-items: center; 
-      background: #f8fafc; 
+      background: rgba(248, 250, 252, 0.8); 
       border: 1px solid #cbd5e1; 
       border-radius: 8px; 
       padding: 14px; 
@@ -122,11 +123,10 @@
     .option-item input { transform: scale(1.2); margin-right: 15px; cursor: pointer; }
     .option-item.selected { background: #eff6ff; border-color: #3b82f6; color: #1e40af; font-weight: 600; box-shadow: 0 0 0 1px #3b82f6; }
 
-    /* Tombol Navigasi Bawah */
     .cat-question-footer {
       height: 75px;
       border-top: 1px solid #e2e8f0;
-      background: #f8fafc;
+      background: rgba(248, 250, 252, 0.9);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -134,10 +134,10 @@
       flex-shrink: 0;
     }
 
-    /* PANEL KANAN: Navigasi Nomor */
     .cat-right-panel {
       width: 360px;
-      background: white;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(5px);
       border-radius: 12px;
       border: 1px solid #e2e8f0;
       padding: 20px;
@@ -164,7 +164,7 @@
       font-weight: bold; 
       border: 1px solid #cbd5e1; 
       border-radius: 8px; 
-      background: #ffffff; 
+      background: rgba(255, 255, 255, 0.8); 
       color: #475569; 
       display: flex; 
       align-items: center; 
@@ -210,7 +210,7 @@
   </div>
 
   <div id="exam-page">
-    <header class="cat-header shadow-sm bg-white">
+    <header class="cat-header shadow-sm">
       <div class="w-100 d-flex justify-content-between align-items-center">
         <div>
           <h5 class="fw-bold text-dark m-0">CAT SEMARAK SPENSANECI</h5>
@@ -262,15 +262,12 @@
     const inputNoPeserta = document.getElementById('no-peserta');
     const statusKetik = document.getElementById('status-ketik');
 
-    // CHEK AUTOMATIS JIKA PENGGUNA SUDAH LOGIN SEBELUMNYA (ANTI-REFRESH)
     window.addEventListener('DOMContentLoaded', () => {
       const sessionActive = localStorage.getItem('cat_session_active');
       const savedData = localStorage.getItem('cat_participant_data');
       
       if (sessionActive === 'true' && savedData) {
         participantData = JSON.parse(savedData);
-        
-        // Langsung bypass, ambil soal, dan mulai ujian tanpa form login
         document.getElementById('login-page').style.setProperty('display', 'none', 'important');
         document.getElementById('exam-page').style.display = 'flex';
         
@@ -279,7 +276,7 @@
         .then(res => {
           if (res.success) {
             questionsList = res.questions;
-            startExam(true); // true = bypass login status ke server
+            startExam(true);
           } else {
             alert("Gagal mengambil file bank soal.");
             resetSessionForce();
@@ -338,15 +335,9 @@
           document.getElementById('nama-peserta').value = res.namaPeserta;
           document.getElementById('asal-sekolah').value = res.asalSekolah;
           document.getElementById('btn-masuk').disabled = false;
-          
           statusKetik.className = "small mt-1 fw-bold text-success text-center";
           statusKetik.innerText = "✅ Nomor Ditemukan!";
-          
-          participantData = {
-            noPeserta: noInput,
-            namaPeserta: res.namaPeserta,
-            asalSekolah: res.asalSekolah
-          };
+          participantData = { noPeserta: noInput, namaPeserta: res.namaPeserta, asalSekolah: res.asalSekolah };
         } else {
           statusKetik.className = "small mt-1 fw-bold text-danger text-center";
           statusKetik.innerText = "❌ Nomor tidak terdaftar!";
@@ -377,15 +368,11 @@
       .then(res => res.json())
       .then(res => {
         if (res.success) {
-          // Kunci status sesi aktif di lokal komputer siswa
           localStorage.setItem('cat_session_active', 'true');
           localStorage.setItem('cat_participant_data', JSON.stringify(participantData));
-          
           questionsList = res.questions;
-          
           document.getElementById('login-page').style.setProperty('display', 'none', 'important');
           document.getElementById('exam-page').style.display = 'flex';
-          
           startExam(false);
         } else { 
           alert("Gagal mengambil file bank soal."); 
@@ -403,12 +390,8 @@
 
     function startExam(isBypassed) {
       document.getElementById('display-nama').innerText = participantData.namaPeserta + " (" + participantData.asalSekolah + ")";
-      
       const savedAnswers = localStorage.getItem('cat_answers_' + participantData.noPeserta);
-      if (savedAnswers) {
-        userAnswers = JSON.parse(savedAnswers);
-      }
-
+      if (savedAnswers) { userAnswers = JSON.parse(savedAnswers); }
       currentIdx = 0; 
       showSingleQuestion();
       renderNavigationGrid();
@@ -421,7 +404,6 @@
         container.innerHTML = `<div class="cat-question-content"><div class="alert alert-danger">Bank soal kosong di Google Sheets Anda.</div></div>`;
         return;
       }
-
       const q = questionsList[currentIdx];
       let nomor = q.no || (currentIdx + 1).toString();
       let gambarHtml = q.gambar ? `<div class="text-center"><img src="${q.gambar}" class="soal-gambar" alt="Gambar Soal"></div>` : '';
@@ -433,176 +415,97 @@
             <h5 class="fw-bold m-0 text-primary">SOAL NOMOR ${nomor}</h5>
             <span class="badge bg-secondary px-2 py-1 fw-bold">Soal ${currentIdx + 1} dari ${questionsList.length}</span>
           </div>
-          
           <p class="fs-5 fw-semibold text-dark mb-3" style="line-height: 1.5;">${q.teks}</p>
           ${gambarHtml}
-          
           <div class="options-container">
             <div class="option-item ${currentSelected === 'A' ? 'selected' : ''}" onclick="selectOption('${nomor}', 'A')">
-              <input type="radio" name="cat-opt" value="A" ${currentSelected === 'A' ? 'checked' : ''}>
-              <span><b>A.</b> ${q.opsiA}</span>
+              <input type="radio" name="cat-opt" value="A" ${currentSelected === 'A' ? 'checked' : ''}><span><b>A.</b> ${q.opsiA}</span>
             </div>
             <div class="option-item ${currentSelected === 'B' ? 'selected' : ''}" onclick="selectOption('${nomor}', 'B')">
-              <input type="radio" name="cat-opt" value="B" ${currentSelected === 'B' ? 'checked' : ''}>
-              <span><b>B.</b> ${q.opsiB}</span>
+              <input type="radio" name="cat-opt" value="B" ${currentSelected === 'B' ? 'checked' : ''}><span><b>B.</b> ${q.opsiB}</span>
             </div>
             <div class="option-item ${currentSelected === 'C' ? 'selected' : ''}" onclick="selectOption('${nomor}', 'C')">
-              <input type="radio" name="cat-opt" value="C" ${currentSelected === 'C' ? 'checked' : ''}>
-              <span><b>C.</b> ${q.opsiC}</span>
+              <input type="radio" name="cat-opt" value="C" ${currentSelected === 'C' ? 'checked' : ''}><span><b>C.</b> ${q.opsiC}</span>
             </div>
             <div class="option-item ${currentSelected === 'D' ? 'selected' : ''}" onclick="selectOption('${nomor}', 'D')">
-              <input type="radio" name="cat-opt" value="D" ${currentSelected === 'D' ? 'checked' : ''}>
-              <span><b>D.</b> ${q.opsiD}</span>
+              <input type="radio" name="cat-opt" value="D" ${currentSelected === 'D' ? 'checked' : ''}><span><b>D.</b> ${q.opsiD}</span>
             </div>
           </div>
         </div>
-
         <div class="cat-question-footer">
           <button class="btn btn-outline-secondary fw-bold px-4" onclick="prevQuestion()" ${currentIdx === 0 ? 'disabled' : ''}>◁ SEBELUMNYA</button>
           <button class="btn btn-primary fw-bold px-4" onclick="nextQuestion()" ${currentIdx === questionsList.length - 1 ? 'disabled' : ''}>SELANJUTNYA ▷</button>
         </div>
       `;
-      
       container.innerHTML = htmlContent;
     }
 
     function renderNavigationGrid() {
       const gridContainer = document.getElementById('grid-navigasi-nomor');
       gridContainer.innerHTML = "";
-
       questionsList.forEach((q, index) => {
         const nomor = q.no || (index + 1).toString();
         const btn = document.createElement('button');
         btn.type = "button";
         btn.className = "btn-nav-no";
         btn.innerText = nomor;
-
-        if (index === currentIdx) {
-          btn.classList.add('active-now'); 
-        } else if (userAnswers[nomor]) {
-          btn.classList.add('answered'); 
-        }
-
-        btn.onclick = function() {
-          currentIdx = index;
-          showSingleQuestion();
-          renderNavigationGrid();
-        };
-
+        if (index === currentIdx) { btn.classList.add('active-now'); } 
+        else if (userAnswers[nomor]) { btn.classList.add('answered'); }
+        btn.onclick = function() { currentIdx = index; showSingleQuestion(); renderNavigationGrid(); };
         gridContainer.appendChild(btn);
       });
     }
 
     function selectOption(questionNo, optionLetter) {
       userAnswers[questionNo] = optionLetter;
-      
       document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
       const activeRadios = document.getElementsByName('cat-opt');
       activeRadios.forEach(radio => {
-        if(radio.value === optionLetter) {
-          radio.checked = true;
-          radio.parentElement.classList.add('selected');
-        }
+        if(radio.value === optionLetter) { radio.checked = true; radio.parentElement.classList.add('selected'); }
       });
-
       localStorage.setItem('cat_answers_' + participantData.noPeserta, JSON.stringify(userAnswers));
       renderNavigationGrid();
       saveLiveProgress();
     }
 
-    function prevQuestion() {
-      if (currentIdx > 0) {
-        currentIdx--;
-        showSingleQuestion();
-        renderNavigationGrid();
-      }
-    }
-
-    function nextQuestion() {
-      if (currentIdx < questionsList.length - 1) {
-        currentIdx++;
-        showSingleQuestion();
-        renderNavigationGrid();
-      }
-    }
+    function prevQuestion() { if (currentIdx > 0) { currentIdx--; showSingleQuestion(); renderNavigationGrid(); } }
+    function nextQuestion() { if (currentIdx < questionsList.length - 1) { currentIdx++; showSingleQuestion(); renderNavigationGrid(); } }
 
     function saveLiveProgress() {
       const syncIndicator = document.getElementById('sync-indicator');
-      if(syncIndicator) {
-        syncIndicator.innerText = "⏳ Menyimpan...";
-        syncIndicator.style.color = "#f59e0b";
-      }
-
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'saveLiveProgress', participantData: participantData, userAnswers: userAnswers })
-      })
-      .then(() => { 
-        if(syncIndicator) {
-          syncIndicator.innerText = "✓ Tersinkronisasi"; 
-          syncIndicator.style.color = "#10b981"; 
-        }
-      })
+      if(syncIndicator) { syncIndicator.innerText = "⏳ Menyimpan..."; syncIndicator.style.color = "#f59e0b"; }
+      fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveLiveProgress', participantData: participantData, userAnswers: userAnswers }) })
+      .then(() => { if(syncIndicator) { syncIndicator.innerText = "✓ Tersinkronisasi"; syncIndicator.style.color = "#10b981"; } })
       .catch(err => console.error(err));
     }
 
     function startTimer() {
       const timerDisplay = document.getElementById('exam-timer');
       let savedEndTime = localStorage.getItem('cat_endTime_' + participantData.noPeserta);
-      
-      if (!savedEndTime) {
-        savedEndTime = Date.now() + (DURASI_UJIAN_DETIK * 1000);
-        localStorage.setItem('cat_endTime_' + participantData.noPeserta, savedEndTime);
-      }
-
+      if (!savedEndTime) { savedEndTime = Date.now() + (DURASI_UJIAN_DETIK * 1000); localStorage.setItem('cat_endTime_' + participantData.noPeserta, savedEndTime); }
       timerInterval = setInterval(() => {
         let remainingSeconds = Math.floor((savedEndTime - Date.now()) / 1000);
-        
-        if (remainingSeconds <= 0) { 
-          clearInterval(timerInterval); 
-          timerDisplay.innerText = "00:00";
-          submitExamFinal(); 
-          return;
-        }
-
+        if (remainingSeconds <= 0) { clearInterval(timerInterval); timerDisplay.innerText = "00:00"; submitExamFinal(); return; }
         let minutes = Math.floor(remainingSeconds / 60);
         let seconds = remainingSeconds % 60;
         timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       }, 1000);
     }
 
-    function confirmSubmit() {
-      if(confirm("Apakah Anda yakin ingin mengakhiri ujian? Pastikan semua nomor di kotak kanan sudah berwarna hijau.")) { 
-        submitExamFinal(); 
-      }
-    }
+    function confirmSubmit() { if(confirm("Apakah Anda yakin ingin mengakhiri ujian? Pastikan semua nomor di kotak kanan sudah berwarna hijau.")) { submitExamFinal(); } }
 
     function submitExamFinal() {
       clearInterval(timerInterval);
       document.getElementById('btn-submit-final').disabled = true;
-      
       let savedEndTime = localStorage.getItem('cat_endTime_' + participantData.noPeserta);
       let remainingSeconds = Math.floor((savedEndTime - Date.now()) / 1000);
       let waktuTerpakai = DURASI_UJIAN_DETIK - (remainingSeconds > 0 ? remainingSeconds : 0);
-
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'submitAnswers', participantData: participantData, userAnswers: userAnswers, totalTimeInSeconds: waktuTerpakai })
-      })
+      fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'submitAnswers', participantData: participantData, userAnswers: userAnswers, totalTimeInSeconds: waktuTerpakai }) })
       .then(res => res.json())
       .then(res => { 
-        if(res.success) { 
-          alert("Ujian selesai! Jawaban Anda telah berhasil dikunci."); 
-          
-          // BERSIHKAN STATUS SESI KETIKA SELESAI SECARA RESMI
-          localStorage.clear();
-          window.location.reload(); 
-        } 
+        if(res.success) { alert("Ujian selesai! Jawaban Anda telah berhasil dikunci."); localStorage.clear(); window.location.reload(); } 
       })
-      .catch(err => { 
-        alert("Koneksi internet bermasalah. Silakan klik kembali tombol akhiri ujian."); 
-        document.getElementById('btn-submit-final').disabled = false; 
-      });
+      .catch(err => { alert("Koneksi internet bermasalah. Silakan klik kembali tombol akhiri ujian."); document.getElementById('btn-submit-final').disabled = false; });
     }
   </script>
 </body>
