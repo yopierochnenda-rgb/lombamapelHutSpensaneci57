@@ -79,7 +79,7 @@
 
     <div class="nav-floating-box text-center">
       <p class="small text-muted mb-2 fw-semibold">Pastikan semua soal terjawab sebelum selesai</p>
-      <button onclick="confirmSubmit()" id="btn-submit-final" class="btn btn-danger btn-lg px-5 fw-bold shadow">AKHIRI & KIRIM JAWABAN</button>
+      <button type="button" onclick="confirmSubmit()" id="btn-submit-final" class="btn btn-danger btn-lg px-5 fw-bold shadow">AKHIRI & KIRIM JAWABAN</button>
     </div>
   </div>
 
@@ -90,12 +90,11 @@
     let userAnswers = {};
     let questionsList = [];
     let timerInterval;
-    let totalTimeInSeconds = 5400; 
+    const DURASI_UJIAN_DETIK = 5400; // 90 Menit
 
     function cekNomorPeserta() {
       const noInput = document.getElementById('no-peserta').value.trim();
       const btnCek = document.getElementById('btn-cek');
-      
       if(!noInput) { alert("Masukkan nomor ujian terlebih dahulu!"); return; }
       
       btnCek.innerText = "Mengecek...";
@@ -153,7 +152,11 @@
         if (res.success) {
           questionsList = res.questions;
           startExam();
-        } else { alert("Gagal mengambil file bank soal."); btn.innerText = "MASUK RUANG UJIAN"; btn.disabled = false; }
+        } else { 
+          alert("Gagal mengambil file bank soal."); 
+          btn.innerText = "MASUK RUANG UJIAN"; 
+          btn.disabled = false; 
+        }
       })
       .catch(err => {
         console.error(err);
@@ -167,6 +170,13 @@
       document.getElementById('login-page').style.display = 'none';
       document.getElementById('exam-page').style.display = 'block';
       document.getElementById('display-nama').innerText = participantData.namaPeserta + " (" + participantData.noPeserta.toUpperCase() + ")";
+      
+      // MEMORI JAWABAN: Memulihkan centangan jawaban terakhir jika di-refresh
+      const savedAnswers = localStorage.getItem('cat_answers_' + participantData.noPeserta);
+      if (savedAnswers) {
+        userAnswers = JSON.parse(savedAnswers);
+      }
+
       renderQuestions();
       startTimer();
     }
@@ -174,20 +184,52 @@
     function renderQuestions() {
       const container = document.getElementById('box-daftar-soal');
       container.innerHTML = "";
+
+      if (!questionsList || questionsList.length === 0) {
+        container.innerHTML = `
+          <div class="alert alert-danger text-start p-4 border border-danger shadow-sm" style="border-radius: 12px;">
+            <h5 class="fw-bold mb-3 text-danger">⚠️ Bank Soal Kosong atau Tidak Terbaca!</h5>
+            <p class="mb-1">Sistem berhasil login, tetapi gagal menampilkan butir soal. Silakan cek Google Sheets Anda:</p>
+            <ol class="mb-0">
+              <li>Pastikan <b>Kolom A (No)</b> sudah terisi angka (1, 2, 3, dst) secara berurutan tanpa jeda kosong.</li>
+              <li>Pastikan baris soal dimulai tepat di <b>Baris 2 (Row 2)</b>.</li>
+            </ol>
+          </div>
+        `;
+        return;
+      }
+
       questionsList.forEach((q) => {
         const qCard = document.createElement('div');
         qCard.className = "question-card shadow-sm";
         let gambarHtml = q.gambar ? `<div class="text-center"><img src="${q.gambar}" class="soal-gambar" alt="Gambar Soal"></div>` : '';
         
+        let teksSoal = q.teks || q.soal || q.Soal || q.pertanyaan || "Teks soal tidak tersedia.";
+        let optA = q.opsiA || q.OpsiA || q['Opsi A'] || "-";
+        let optB = q.opsiB || q.OpsiB || q['Opsi B'] || "-";
+        let optC = q.opsiC || q.OpsiC || q['Opsi C'] || "-";
+        let optD = q.opsiD || q.OpsiD || q['Opsi D'] || "-";
+        let nomor = q.no || q.No || "-";
+
+        // MEMORI TAMPILAN: Otomatis pasang class 'selected' dan tanda 'checked' dari riwayat pengerjaan
+        let ansA = (userAnswers[nomor] === 'A') ? 'checked' : '';
+        let classA = (userAnswers[nomor] === 'A') ? 'selected' : '';
+        let ansB = (userAnswers[nomor] === 'B') ? 'checked' : '';
+        let classB = (userAnswers[nomor] === 'B') ? 'selected' : '';
+        let ansC = (userAnswers[nomor] === 'C') ? 'checked' : '';
+        let classC = (userAnswers[nomor] === 'C') ? 'selected' : '';
+        let ansD = (userAnswers[nomor] === 'D') ? 'checked' : '';
+        let classD = (userAnswers[nomor] === 'D') ? 'selected' : '';
+
         qCard.innerHTML = `
-          <h5 class="fw-bold mb-3 text-primary">Soal Nomor ${q.no}</h5>
-          <p class="fs-5 mb-4 fw-semibold text-dark">${q.teks}</p>
+          <h5 class="fw-bold mb-3 text-primary">Soal Nomor ${nomor}</h5>
+          <p class="fs-5 mb-4 fw-semibold text-dark">${teksSoal}</p>
           ${gambarHtml}
           <div class="options-group">
-            <div class="option-btn" id="opt-${q.no}-A" onclick="selectOption('${q.no}', 'A')"><input type="radio" name="question-${q.no}" value="A"> <b>A.</b> ${q.opsiA}</div>
-            <div class="option-btn" id="opt-${q.no}-B" onclick="selectOption('${q.no}', 'B')"><input type="radio" name="question-${q.no}" value="B"> <b>B.</b> ${q.opsiB}</div>
-            <div class="option-btn" id="opt-${q.no}-C" onclick="selectOption('${q.no}', 'C')"><input type="radio" name="question-${q.no}" value="C"> <b>C.</b> ${q.opsiC}</div>
-            <div class="option-btn" id="opt-${q.no}-D" onclick="selectOption('${q.no}', 'D')"><input type="radio" name="question-${q.no}" value="D"> <b>D.</b> ${q.opsiD}</div>
+            <div class="option-btn ${classA}" id="opt-${nomor}-A" onclick="selectOption('${nomor}', 'A')"><input type="radio" name="question-${nomor}" value="A" ${ansA}> <b>A.</b> ${optA}</div>
+            <div class="option-btn ${classB}" id="opt-${nomor}-B" onclick="selectOption('${nomor}', 'B')"><input type="radio" name="question-${nomor}" value="B" ${ansB}> <b>B.</b> ${optB}</div>
+            <div class="option-btn ${classC}" id="opt-${nomor}-C" onclick="selectOption('${nomor}', 'C')"><input type="radio" name="question-${nomor}" value="C" ${ansC}> <b>C.</b> ${optC}</div>
+            <div class="option-btn ${classD}" id="opt-${nomor}-D" onclick="selectOption('${nomor}', 'D')"><input type="radio" name="question-${nomor}" value="D" ${ansD}> <b>D.</b> ${optD}</div>
           </div>
         `;
         container.appendChild(qCard);
@@ -200,6 +242,9 @@
       document.getElementById(`opt-${questionNo}-${optionLetter}`).classList.add('selected');
       const radio = document.querySelector(`#opt-${questionNo}-${optionLetter} input`);
       if(radio) radio.checked = true;
+      
+      // Simpan salinan ke penyimpanan lokal browser
+      localStorage.setItem('cat_answers_' + participantData.noPeserta, JSON.stringify(userAnswers));
       saveLiveProgress();
     }
 
@@ -218,11 +263,26 @@
 
     function startTimer() {
       const timerDisplay = document.getElementById('exam-timer');
+      
+      // MEMORI WAKTU: Cari waktu akhir absolut di komputer siswa agar anti-curang F5
+      let savedEndTime = localStorage.getItem('cat_endTime_' + participantData.noPeserta);
+      if (!savedEndTime) {
+        savedEndTime = Date.now() + (DURASI_UJIAN_DETIK * 1000);
+        localStorage.setItem('cat_endTime_' + participantData.noPeserta, savedEndTime);
+      }
+
       timerInterval = setInterval(() => {
-        totalTimeInSeconds--;
-        if (totalTimeInSeconds <= 0) { clearInterval(timerInterval); submitExamFinal(); }
-        let minutes = Math.floor(totalTimeInSeconds / 60);
-        let seconds = totalTimeInSeconds % 60;
+        let remainingSeconds = Math.floor((savedEndTime - Date.now()) / 1000);
+        
+        if (remainingSeconds <= 0) { 
+          clearInterval(timerInterval); 
+          timerDisplay.innerText = "00:00";
+          submitExamFinal(); 
+          return;
+        }
+
+        let minutes = Math.floor(remainingSeconds / 60);
+        let seconds = remainingSeconds % 60;
         timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       }, 1000);
     }
@@ -234,15 +294,29 @@
     function submitExamFinal() {
       clearInterval(timerInterval);
       document.getElementById('btn-submit-final').disabled = true;
-      const waktuTerpakai = 5400 - totalTimeInSeconds;
+      
+      let savedEndTime = localStorage.getItem('cat_endTime_' + participantData.noPeserta);
+      let remainingSeconds = Math.floor((savedEndTime - Date.now()) / 1000);
+      let waktuTerpakai = DURASI_UJIAN_DETIK - (remainingSeconds > 0 ? remainingSeconds : 0);
 
       fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify({ action: 'submitAnswers', participantData: participantData, userAnswers: userAnswers, totalTimeInSeconds: waktuTerpakai })
       })
       .then(res => res.json())
-      .then(res => { if(res.success) { alert("Ujian selesai! Nilai Anda sudah terekam."); window.location.reload(); } })
-      .catch(err => { alert("Koneksi terputus. Klik kembali tombol."); document.getElementById('btn-submit-final').disabled = false; });
+      .then(res => { 
+        if(res.success) { 
+          alert("Ujian selesai! Nilai Anda sudah terekam."); 
+          // BERSIHKAN MEMORI: Hapus jejak setelah sukses mengumpulkan agar tidak bisa masuk lagi
+          localStorage.removeItem('cat_answers_' + participantData.noPeserta);
+          localStorage.removeItem('cat_endTime_' + participantData.noPeserta);
+          window.location.reload(); 
+        } 
+      })
+      .catch(err => { 
+        alert("Koneksi terputus. Klik kembali tombol."); 
+        document.getElementById('btn-submit-final').disabled = false; 
+      });
     }
   </script>
 </body>
