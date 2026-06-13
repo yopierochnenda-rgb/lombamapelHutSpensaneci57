@@ -6,46 +6,187 @@
   <title>Sistem Ujian CAT - SEMARAK SPENSANECI</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-    body { background-color: #f8fafc; color: #334155; font-family: 'Segoe UI', sans-serif; }
-    .logo-container { width: 75px; height: 75px; border-radius: 50%; background: #fff; border: 3px solid #0d6efd; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    /* KUNCI UTAMA: Matikan scroll browser secara total */
+    html, body { 
+      height: 100%; 
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden; 
+      background-color: #f1f5f9; 
+      color: #334155; 
+      font-family: 'Segoe UI', sans-serif; 
+    }
+    
+    /* Layout Login */
+    #login-page { 
+      height: 100vh; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+    }
+    .card-custom { 
+      border: none; 
+      border-radius: 16px; 
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); 
+      background: #ffffff; 
+    }
+    .logo-container { 
+      width: 70px; 
+      height: 70px; 
+      border-radius: 50%; 
+      background: #fff; 
+      border: 3px solid #0d6efd; 
+      display: inline-flex; 
+      align-items: center; 
+      justify-content: center; 
+      overflow: hidden; 
+    }
     .logo-container img { width: 100%; height: 100%; object-fit: cover; }
-    .card-custom { border: none; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); background: #ffffff; }
+
+    /* LAYOUT UTAMA CAT (ANTI-SCROLL HALAMAN) */
+    #exam-page { 
+      height: 100vh; 
+      display: none; 
+      flex-direction: column; 
+    }
     
-    /* Layout CAT Modern */
-    #exam-page { display: none; }
-    .cat-header { background: #ffffff; border-bottom: 2px solid #e2e8f0; padding: 15px 0; sticky-top }
-    .timer-box { font-size: 1.5rem; font-weight: 800; color: #ef4444; background: #fee2e2; padding: 5px 20px; border-radius: 8px; border: 1px solid #fca5a5; display: inline-block; }
+    .cat-header { 
+      height: 75px; 
+      background: #ffffff; 
+      border-bottom: 2px solid #e2e8f0; 
+      display: flex; 
+      align-items: center;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
     
-    /* Area Soal */
-    .question-box { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 30px; min-height: 400px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .soal-gambar { max-width: 100%; max-height: 280px; object-fit: contain; border-radius: 8px; margin: 15px auto; border: 1px solid #e2e8f0; display: block; }
+    .timer-box { 
+      font-size: 1.4rem; 
+      font-weight: 800; 
+      color: #ef4444; 
+      background: #fee2e2; 
+      padding: 4px 18px; 
+      border-radius: 8px; 
+      border: 1px solid #fca5a5; 
+    }
+
+    /* Pembagian Ruang Panel Kiri & Kanan */
+    .cat-workspace {
+      flex: 1;
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+      overflow: hidden; /* Mengunci konten agar tidak menjebol ke bawah */
+    }
+
+    /* PANEL KIRI: Tempat Soal Aktif */
+    .cat-left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    }
     
-    /* Tombol Pilihan Ganda */
-    .option-item { display: flex; align-items: center; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 15px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s ease; }
+    /* Box Teks Soal & Opsi (Hanya area ini yang boleh scroll jika soalnya kepanjangan) */
+    .cat-question-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px;
+    }
+    
+    .soal-gambar { 
+      max-width: 100%; 
+      max-height: 240px; 
+      object-fit: contain; 
+      border-radius: 8px; 
+      margin: 15px 0; 
+      border: 1px solid #e2e8f0; 
+    }
+
+    .option-item { 
+      display: flex; 
+      align-items: center; 
+      background: #f8fafc; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 8px; 
+      padding: 14px; 
+      margin-bottom: 12px; 
+      cursor: pointer; 
+      transition: all 0.15s ease; 
+    }
     .option-item:hover { background: #f1f5f9; border-color: #94a3b8; }
-    .option-item input { transform: scale(1.3); margin-right: 15px; cursor: pointer; }
+    .option-item input { transform: scale(1.2); margin-right: 15px; cursor: pointer; }
     .option-item.selected { background: #eff6ff; border-color: #3b82f6; color: #1e40af; font-weight: 600; box-shadow: 0 0 0 1px #3b82f6; }
+
+    /* Tombol Navigasi Bawah (Mempunyai posisi fix terkunci di bawah panel) */
+    .cat-question-footer {
+      height: 75px;
+      border-top: 1px solid #e2e8f0;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 30px;
+      flex-shrink: 0;
+    }
+
+    /* PANEL KANAN: Navigasi Nomor (Fix Terkunci di Samping) */
+    .cat-right-panel {
+      width: 360px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    .cat-grid-wrapper {
+      flex: 1;
+      overflow-y: auto; /* Grid nomor akan scroll internal jika nomor sangat banyak */
+      padding-right: 5px;
+    }
+
+    .grid-nomor { 
+      display: grid; 
+      grid-template-columns: repeat(5, 1fr); 
+      gap: 10px; 
+    }
     
-    /* Sidebar Nomor Navigasi */
-    .sidebar-nav { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-    .grid-nomor { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; max-height: 320px; overflow-y: auto; padding-right: 5px; }
-    .btn-nav-no { width: 100%; height: 45px; font-weight: bold; font-size: 0.95rem; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #475569; display: flex; align-items: center; justify-content: center; transition: all 0.15s ease; }
+    .btn-nav-no { 
+      height: 45px; 
+      font-weight: bold; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 8px; 
+      background: #ffffff; 
+      color: #475569; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      transition: all 0.15s ease; 
+    }
     .btn-nav-no:hover { border-color: #64748b; background: #f1f5f9; }
     .btn-nav-no.answered { background: #10b981 !important; color: white !important; border-color: #059669 !important; }
-    .btn-nav-no.active-now { background: #3b82f6 !important; color: white !important; border-color: #2563eb !important; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4); }
+    .btn-nav-no.active-now { background: #3b82f6 !important; color: white !important; border-color: #2563eb !important; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
     
-    .status-sync { font-size: 0.85rem; font-weight: 600; color: #10b981; display: inline-flex; align-items: center; gap: 5px; }
+    .status-sync { font-size: 0.85rem; font-weight: 600; color: #10b981; }
   </style>
 </head>
 <body>
 
-  <div id="login-page" class="container min-vh-100 d-flex align-items-center justify-content-center">
-    <div class="card card-custom p-4 p-md-5 text-center" style="width: 100%; max-width: 500px;">
+  <div id="login-page" class="container">
+    <div class="card card-custom p-4 p-md-5 text-center" style="width: 100%; max-width: 480px;">
       <div class="d-flex justify-content-center gap-3 mb-4">
         <div class="logo-container"><img src="logo.png" alt="Logo 1"></div>
         <div class="logo-container" style="border-color: #ffc107;"><img src="logo2.png" alt="Logo 2"></div>
       </div>
-      <h3 class="fw-bold text-dark m-0">SEMARAK SPENSANECI</h3>
+      <h4 class="fw-bold text-dark m-0">SEMARAK SPENSANECI</h4>
       <p class="text-muted small mb-4">Sistem CAT Terkunci - Masukkan Nomor Ujian</p>
       
       <div class="text-start mb-3">
@@ -71,53 +212,48 @@
   </div>
 
   <div id="exam-page">
-    <header class="cat-header shadow-sm sticky-top bg-white mb-4">
-      <div class="container-fluid px-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+    
+    <header class="cat-header shadow-sm bg-white">
+      <div class="w-100 d-flex justify-content-between align-items-center">
         <div>
           <h5 class="fw-bold text-dark m-0">CAT SEMARAK SPENSANECI</h5>
           <span class="text-muted small">Peserta: <b class="text-primary" id="display-nama">-</b></span>
         </div>
         <div class="d-flex align-items-center gap-4">
-          <div class="text-end d-none d-md-block">
-            <span id="sync-indicator" class="status-sync">✓ Tersinkronisasi</span>
-          </div>
-          <div class="text-center">
-            <span class="small text-secondary d-block fw-bold" style="font-size:0.75rem;">SISA WAKTU</span>
+          <span id="sync-indicator" class="status-sync">✓ Tersinkronisasi</span>
+          <div class="d-flex align-items-center gap-2 bg-light px-3 py-1 rounded border">
+            <span class="small text-secondary fw-bold" style="font-size:0.75rem;">SISA WAKTU:</span>
             <div class="timer-box" id="exam-timer">90:00</div>
           </div>
         </div>
       </div>
     </header>
 
-    <div class="container-fluid px-4">
-      <div class="row g-4">
-        
-        <div class="col-lg-8">
-          <div class="question-box" id="container-soal-tunggal">
-            <div class="text-center py-5 text-muted">Memuat data soal...</div>
-          </div>
-        </div>
-        
-        <div class="col-lg-4">
-          <div class="sidebar-nav mb-4">
-            <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">NAVIGASI SOAL</h6>
-            
-            <div class="grid-nomor id" id="grid-navigasi-nomor">
-              </div>
-            
-            <hr class="my-3">
-            
-            <div class="d-flex justify-content-between text-center small fw-semibold text-muted mb-4">
-              <div><span class="badge bg-primary px-2 py-1 mb-1 d-block">&nbsp;</span>Posisi Sekarang</div>
-              <div><span class="badge bg-success px-2 py-1 mb-1 d-block">&nbsp;</span>Sudah Dijawab</div>
-              <div><span class="badge bg-white text-dark border px-2 py-1 mb-1 d-block">&nbsp;</span>Belum Dijawab</div>
-            </div>
-            
-            <button type="button" onclick="confirmSubmit()" id="btn-submit-final" class="btn btn-danger w-100 fw-bold py-2 shadow-sm">AKHIRI & KIRIM JAWABAN</button>
-          </div>
-        </div>
-
+    <div class="cat-workspace">
+      
+      <div class="cat-left-panel" id="container-soal-tunggal">
+        <div class="text-center py-5 text-muted">Memuat data ruang ujian...</div>
       </div>
+      
+      <div class="cat-right-panel">
+        <h6 class="fw-bold text-secondary border-bottom pb-2 mb-3">NAVIGASI NOMOR SOAL</h6>
+        
+        <div class="cat-grid-wrapper">
+          <div class="grid-nomor" id="grid-navigasi-nomor">
+            </div>
+        </div>
+        
+        <hr class="my-3 flex-shrink-0">
+        
+        <div class="d-flex justify-content-between text-center small fw-semibold text-muted mb-3 flex-shrink-0">
+          <div><span class="badge bg-primary px-2 py-1 mb-1 d-block">&nbsp;</span>Posisi</div>
+          <div><span class="badge bg-success px-2 py-1 mb-1 d-block">&nbsp;</span>Terjawab</div>
+          <div><span class="badge bg-white text-dark border px-2 py-1 mb-1 d-block">&nbsp;</span>Kosong</div>
+        </div>
+        
+        <button type="button" onclick="confirmSubmit()" id="btn-submit-final" class="btn btn-danger w-100 fw-bold py-2 shadow-sm flex-shrink-0">AKHIRI UJIAN</button>
+      </div>
+
     </div>
   </div>
 
@@ -127,7 +263,7 @@
     let participantData = {};
     let userAnswers = {};
     let questionsList = [];
-    let currentIdx = 0; // Menyimpan index nomor soal yang sedang dibuka siswa
+    let currentIdx = 0; 
     let timerInterval;
     const DURASI_UJIAN_DETIK = 5400; // 90 Menit
 
@@ -206,48 +342,44 @@
     }
 
     function startExam() {
-      document.getElementById('login-page').style.display = 'none';
-      document.getElementById('exam-page').style.display = 'block';
-      document.getElementById('display-nama').innerText = participantData.namaPeserta + " [" + participantData.asalSekolah + "]";
+      document.getElementById('login-page').style.setProperty('display', 'none', 'important');
+      document.getElementById('exam-page').style.display = 'flex';
+      document.getElementById('display-nama').innerText = participantData.namaPeserta + " (" + participantData.asalSekolah + ")";
       
-      // Mengambil data jawaban lama di browser jika tidak sengaja ter-refresh
       const savedAnswers = localStorage.getItem('cat_answers_' + participantData.noPeserta);
       if (savedAnswers) {
         userAnswers = JSON.parse(savedAnswers);
       }
 
-      currentIdx = 0; // Mulai dari soal pertama (index 0)
+      currentIdx = 0; 
       showSingleQuestion();
       renderNavigationGrid();
       startTimer();
     }
 
-    // FUNGSI UTAMA CAT: Merender HANYA SATU SOAL aktif di layar
     function showSingleQuestion() {
       const container = document.getElementById('container-soal-tunggal');
       if (!questionsList || questionsList.length === 0) {
-        container.innerHTML = `<div class="alert alert-danger">Bank soal kosong di Google Sheets Anda.</div>`;
+        container.innerHTML = `<div class="cat-question-content"><div class="alert alert-danger">Bank soal kosong di Google Sheets Anda.</div></div>`;
         return;
       }
 
       const q = questionsList[currentIdx];
       let nomor = q.no || (currentIdx + 1).toString();
-      let gambarHtml = q.gambar ? `<img src="${q.gambar}" class="soal-gambar" alt="Gambar Soal">` : '';
-      
-      // Ambil jawaban terpilih untuk nomor ini (jika ada)
+      let gambarHtml = q.gambar ? `<div class="text-center"><img src="${q.gambar}" class="soal-gambar" alt="Gambar Soal"></div>` : '';
       let currentSelected = userAnswers[nomor] || '';
 
       let htmlContent = `
-        <div>
-          <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-4">
-            <h4 class="fw-bold m-0 text-primary">SOAL NOMOR ${nomor}</h4>
-            <span class="badge bg-secondary px-3 py-2 fw-bold">Soal ${currentIdx + 1} dari ${questionsList.length}</span>
+        <div class="cat-question-content">
+          <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
+            <h5 class="fw-bold m-0 text-primary">SOAL NOMOR ${nomor}</h5>
+            <span class="badge bg-secondary px-2 py-1 fw-bold">Soal ${currentIdx + 1} dari ${questionsList.length}</span>
           </div>
           
-          <p class="fs-5 fw-semibold text-dark mb-4" style="line-height: 1.6;">${q.teks}</p>
+          <p class="fs-5 fw-semibold text-dark mb-3" style="line-height: 1.5;">${q.teks}</p>
           ${gambarHtml}
           
-          <div class="options-container mt-4">
+          <div class="options-container">
             <div class="option-item ${currentSelected === 'A' ? 'selected' : ''}" onclick="selectOption('${nomor}', 'A')">
               <input type="radio" name="cat-opt" value="A" ${currentSelected === 'A' ? 'checked' : ''}>
               <span><b>A.</b> ${q.opsiA}</span>
@@ -267,16 +399,15 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center border-top pt-4 mt-4">
-          <button class="btn btn-outline-secondary btn-lg fw-bold px-4" onclick="prevQuestion()" ${currentIdx === 0 ? 'disabled' : ''}>◁ SEBELUMNYA</button>
-          <button class="btn btn-primary btn-lg fw-bold px-4" onclick="nextQuestion()" ${currentIdx === questionsList.length - 1 ? 'disabled' : ''}>SELANJUTNYA ▷</button>
+        <div class="cat-question-footer">
+          <button class="btn btn-outline-secondary fw-bold px-4" onclick="prevQuestion()" ${currentIdx === 0 ? 'disabled' : ''}>◁ SEBELUMNYA</button>
+          <button class="btn btn-primary fw-bold px-4" onclick="nextQuestion()" ${currentIdx === questionsList.length - 1 ? 'disabled' : ''}>SELANJUTNYA ▷</button>
         </div>
       `;
       
       container.innerHTML = htmlContent;
     }
 
-    // FUNGSI SIDEBAR CAT: Membuat kotak grid nomor angka di samping kanan
     function renderNavigationGrid() {
       const gridContainer = document.getElementById('grid-navigasi-nomor');
       gridContainer.innerHTML = "";
@@ -288,14 +419,12 @@
         btn.className = "btn-nav-no";
         btn.innerText = nomor;
 
-        // Atur warna status kotak angka
         if (index === currentIdx) {
-          btn.classList.add('active-now'); // Berwarna biru (posisi aktif siswa)
+          btn.classList.add('active-now'); 
         } else if (userAnswers[nomor]) {
-          btn.classList.add('answered'); // Berwarna hijau (sudah diisi)
+          btn.classList.add('answered'); 
         }
 
-        // Jika kotak angka diklik, layar langsung melompat ke nomor itu
         btn.onclick = function() {
           currentIdx = index;
           showSingleQuestion();
@@ -309,7 +438,6 @@
     function selectOption(questionNo, optionLetter) {
       userAnswers[questionNo] = optionLetter;
       
-      // Perbarui tampilan centang pada opsi yang diklik
       document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
       const activeRadios = document.getElementsByName('cat-opt');
       activeRadios.forEach(radio => {
@@ -319,7 +447,6 @@
         }
       });
 
-      // Simpan jawaban lokal dan kirim live progress ke server Google
       localStorage.setItem('cat_answers_' + participantData.noPeserta, JSON.stringify(userAnswers));
       renderNavigationGrid();
       saveLiveProgress();
@@ -407,7 +534,7 @@
       .then(res => res.json())
       .then(res => { 
         if(res.success) { 
-          alert("Ujian selesai! Terima kasih, jawaban Anda telah dikunci dan dikirim ke server panitia."); 
+          alert("Ujian selesai! Jawaban Anda telah berhasil dikunci."); 
           localStorage.removeItem('cat_answers_' + participantData.noPeserta);
           localStorage.removeItem('cat_endTime_' + participantData.noPeserta);
           window.location.reload(); 
