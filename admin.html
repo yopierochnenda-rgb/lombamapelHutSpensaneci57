@@ -1,190 +1,328 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - SEMARAK SPENSANECI</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <style>
-    body { background-color: #f1f5f9; font-family: 'Segoe UI', sans-serif; }
-    .admin-card { border: none; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); background: #ffffff; }
-    .header-admin { background: #1e293b; color: white; padding: 20px; border-radius: 12px 12px 0 0; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Input & Cetak Massal Kartu Peserta</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+    </style>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen text-slate-800">
 
-  <div class="container min-vh-100 d-flex align-items-center justify-content-center py-5">
-    <div class="card admin-card w-100" style="max-width: 600px;">
-      <div class="header-admin text-center">
-        <h4 class="fw-bold m-0">🛠️ ADMIN PANEL</h4>
-        <p class="small text-light m-0 opacity-75">Input Data Peserta Susulan / Manual</p>
-      </div>
-     
-      <div class="card-body p-4 p-md-5">
-        <form id="form-admin" onsubmit="tambahPeserta(event)">
-          
-          <div class="mb-3">
-            <label class="form-label fw-bold text-secondary small">Nomor Ujian Peserta</label>
-            <input type="text" id="input-no" class="form-control form-control-lg fw-bold" style="text-transform: uppercase;" placeholder="Contoh: SN-099" required autocomplete="off">
-          </div>
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="bg-white rounded-2xl shadow-sm p-6 mb-8 border border-slate-200/80 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Panel Administrasi Panitia</h1>
+                <p class="text-sm text-slate-500 mt-1">Kelola data, input manual, dan cetak kartu ujian peserta (Tunggal & Massal)</p>
+            </div>
+            <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-100">
+                <span class="text-indigo-600 font-semibold text-sm">Status Server: Online</span>
+            </div>
+        </div>
 
-          <div class="mb-3">
-            <label class="form-label fw-bold text-secondary small">Nama Lengkap</label>
-            <input type="text" id="input-nama" class="form-control form-control-lg fw-semibold" placeholder="Masukkan nama peserta..." required autocomplete="off">
-          </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80">
+                <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <span class="w-2 h-5 bg-green-500 rounded-full inline-block"></span>
+                    Input Peserta Baru
+                </h2>
+                <form id="formInput" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nomor Peserta</label>
+                        <input type="text" id="noPeserta" placeholder="Contoh: UJIAN-001" required 
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+                        <input type="text" id="namaPeserta" placeholder="Masukkan nama peserta" required 
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Asal Sekolah</label>
+                        <input type="text" id="asalSekolah" placeholder="Masukkan asal sekolah" required 
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 rounded-xl shadow-sm shadow-emerald-600/10 transition-all text-sm cursor-pointer">
+                        Simpan & Cetak Kartu Tunggal
+                    </button>
+                </form>
+            </div>
 
-          <div class="mb-4">
-            <label class="form-label fw-bold text-secondary small">Asal Sekolah</label>
-            <input type="text" id="input-sekolah" class="form-control form-control-lg fw-semibold" placeholder="Masukkan asal sekolah..." required autocomplete="off">
-          </div>
+            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-200/80 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <span class="w-2 h-5 bg-indigo-500 rounded-full inline-block"></span>
+                        Cetak Ulang & Cetak Borongan
+                    </h2>
+                    
+                    <div class="space-y-3 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase">Cari & Cetak Kartu Hilang</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="noCari" placeholder="Masukkan No Ujian" 
+                                class="flex-1 px-4 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm uppercase">
+                            <button id="btnCari" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-xl text-sm transition-all cursor-pointer">
+                                Cari
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-          <button type="submit" id="btn-simpan" class="btn btn-success btn-lg w-100 fw-bold shadow-sm">
-            ➕ TAMBAHKAN & CETAK KARTU
-          </button>
-          
-        </form>
-        
-        <div id="alert-msg" class="alert mt-4 d-none text-center fw-bold" role="alert"></div>
-      </div>
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-200/60 text-center">
+                    <p class="text-xs text-amber-800 mb-3 font-medium">Fitur Borongan: Menarik 10 data terakhir di database tab "Peserta" dan menggabungkannya ke dalam 1 file PDF.</p>
+                    <button id="btnCetakMassal" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer text-sm">
+                        🖨️ CETAK 10 PESERTA SEKALIGUS (1 FILE PDF)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="statusLog" class="hidden mt-6 p-4 rounded-xl text-sm text-center font-medium"></div>
     </div>
-  </div>
 
-  <div id="kartu-cetak" style="position: absolute; left: -9999px; width: 323px; height: 204px; background-color: #ffffff; 
-       background-image: 
-          radial-gradient(rgba(30, 41, 59, 0.04) 1.5px, transparent 1.5px),
-          radial-gradient(rgba(30, 41, 59, 0.04) 1.5px, transparent 1.5px),
-          linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-       background-size: 8px 8px, 8px 8px, 100% 100%;
-       background-position: 0 0, 4px 4px, 0 0;
-       border: 2px solid #d4af37; border-radius: 12px; padding: 15px; font-family: 'Segoe UI', Arial, sans-serif; box-sizing: border-box; color: #1e293b; overflow: hidden; box-shadow: inset 0 0 10px rgba(0,0,0,0.05);">
-      
-      <img src="logo2.png" alt="BG Logo" style="position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); width: 135px; height: 135px; object-fit: contain; opacity: 0.12; z-index: 1; pointer-events: none;">
+    <div id="cardTemplate" class="hidden">
+        <div style="width: 350px; height: 220px; background: #ffffff; border: 2px solid #1e293b; border-radius: 12px; padding: 15px; position: relative; box-sizing: border-box; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 8px; background: linear-gradient(90deg, #4f46e5, #06b6d4);"></div>
+            <div style="text-align: center; margin-bottom: 10px; padding-top: 5px;">
+                <h3 style="font-size: 14px; font-weight: bold; color: #0f172a; margin: 0; letter-spacing: 0.5px;">KARTU TANDA PESERTA UJIAN</h3>
+                <p style="font-size: 9px; color: #64748b; margin: 2px 0 0 0; text-transform: uppercase; font-weight: 600;">Ujian Berbasis Komputer (CBT)</p>
+            </div>
+            <div style="height: 1px; background: #e2e8f0; margin-bottom: 12px;"></div>
+            <table style="width: 100%; font-size: 11px; color: #334155; border-collapse: collapse; position: relative; z-index: 10;">
+                <tr>
+                    <td style="width: 30%; font-weight: 600; padding: 4px 0; color: #64748b;">NO PESERTA</td>
+                    <td style="width: 5%; padding: 4px 0;">:</td>
+                    <td id="tmplNo" style="font-weight: 700; color: #1e293b; font-size: 12px; padding: 4px 0;">-</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; padding: 4px 0; color: #64748b;">NAMA</td>
+                    <td>:</td>
+                    <td id="tmplNama" style="font-weight: bold; color: #0f172a; padding: 4px 0;">-</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; padding: 4px 0; color: #64748b;">ASAL SEKOLAH</td>
+                    <td>:</td>
+                    <td id="tmplSekolah" style="color: #334155; padding: 4px 0;">-</td>
+                </tr>
+            </table>
+            <div style="position: absolute; bottom: 12px; left: 15px; right: 15px; font-size: 8px; color: #94a3b8; text-align: center; border-top: 1px dashed #e2e8f0; padding-top: 6px;">
+                Harap kartu ini dibawa dan dijaga dengan baik selama ujian berlangsung.
+            </div>
+        </div>
+    </div>
 
-      <div style="position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(212, 175, 55, 0.08); border-radius: 50%; z-index: 1;"></div>
-      <div style="position: absolute; bottom: -40px; left: -40px; width: 150px; height: 150px; background: rgba(212, 175, 55, 0.06); border-radius: 50%; z-index: 1;"></div>
+    <script>
+        // ⚠️ GANTI VALUE DI BAWAH INI DENGAN URL WEB APP APPS SCRIPT ANDA YANG SEBENARNYA!
+        const API_URL = "ISI_DENGAN_URL_WEB_APP_ANDA";
 
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #d4af37; padding-bottom: 8px; margin-bottom: 20px; position: relative; z-index: 2;">
-          <img src="logo.png" alt="Logo 1" style="width: 38px; height: 38px; object-fit: contain; background: #ffffff; border-radius: 50%; padding: 2px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-          
-          <h4 style="margin: 0; font-size: 11px; text-align: center; color: #b45309; font-weight: 900; line-height: 1.3; text-transform: uppercase; letter-spacing: 1px;">
-              SEMARAK HUT 57<br>
-              <span style="color: #1e293b; font-size: 13px; font-weight: 800;">SPENSANECI 2026</span>
-          </h4>
-          
-          <img src="logo2.png" alt="Logo 2" style="width: 38px; height: 38px; object-fit: contain; background: #ffffff; border-radius: 50%; padding: 2px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-      </div>
-      
-      <div style="font-size: 13px; color: #334155; line-height: 1.8; position: relative; z-index: 2; width: 100%;">
-          <div style="display: flex; margin-bottom: 3px;">
-              <strong style="width: 85px; color: #b45309;">No. Peserta</strong>
-              <span style="font-weight: bold; font-family: 'Courier New', Courier, monospace; font-size: 14px; letter-spacing: 0.5px; color: #0f172a;">: <span id="cetak-no"></span></span>
-          </div>
-          <div style="display: flex; margin-bottom: 3px;">
-              <strong style="width: 85px; color: #b45309;">Nama</strong>
-              <span style="font-weight: bold; text-transform: uppercase; color: #0f172a;">: <span id="cetak-nama"></span></span>
-          </div>
-          <div style="display: flex;">
-              <strong style="width: 85px; color: #b45309;">Sekolah</strong>
-              <span style="font-weight: bold; text-transform: uppercase; color: #0f172a;">: <span id="cetak-sekolah"></span></span>
-          </div>
-      </div>
+        const { jsPDF } = window.jspdf;
 
-      <div style="position: absolute; bottom: 10px; right: 15px; font-size: 9px; color: #b45309; font-weight: bold; letter-spacing: 1px; z-index: 2; border-top: 1px solid rgba(212, 175, 55, 0.3); padding-top: 3px;">
-          PANITIA SEMARAK 57
-      </div>
-  </div>
+        // Fungsi bantu memunculkan log info/eror
+        function tunjukkanLog(pesan, tipe = 'info') {
+            const log = document.getElementById('statusLog');
+            log.classList.remove('hidden', 'bg-blue-50', 'text-blue-700', 'bg-green-50', 'text-green-700', 'bg-red-50', 'text-red-700');
+            if (tipe === 'success') { log.classList.add('bg-green-50', 'text-green-700'); }
+            else if (tipe === 'error') { log.classList.add('bg-red-50', 'text-red-700'); }
+            else { log.classList.add('bg-blue-50', 'text-blue-700'); }
+            log.innerHTML = pesan;
+            log.classList.remove('hidden');
+        }
 
-  <script>
-    // 🚨 WAJIB GANTI LINK INI DENGAN LINK WEB APP ANDA YANG AKTIF!
-    const API_URL = "https://script.google.com/macros/s/AKfycbw6iUsySZVMRFgn-eCqDY7aYTfypTBbQlOnuImhlvbSdKqfdMmyJRPIfYDauKOORQLw/exec";
-
-    // FUNGSI UNTUK MENCETAK KARTU PDF
-    async function downloadKartuPDF(noPeserta, namaPeserta, asalSekolah) {
-        try {
-            // 1. Masukkan data ke template
-            document.getElementById('cetak-no').innerText = noPeserta;
-            document.getElementById('cetak-nama').innerText = namaPeserta;
-            document.getElementById('cetak-sekolah').innerText = asalSekolah;
-
-            // 2. Render HTML jadi Gambar (Canvas)
-            const kartuElement = document.getElementById('kartu-cetak');
-            const canvas = await html2canvas(kartuElement, { 
-                scale: 3, // HD Resolution
-                useCORS: true // Izinkan load gambar/logo dari repo
-            });
-            const imgData = canvas.toDataURL('image/png');
-
-            // 3. Bentuk PDF ukuran KTP
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({
+        // =========================================================
+        // PROSES UTAMA GENERATOR CETAK PDF MENGGUNAKAN JSPDF
+        // =========================================================
+        function generatePDFKartu(dataPesertaArray, namaFile) {
+            // Inisialisasi jsPDF dengan orientasi Landscape, satuan mm, ukuran Kartu (ID-1 standar: 85mm x 54mm)
+            // Biar gampang dicetak, kita pakai ukuran custom sedikit lebih besar agar pas: 100mm x 65mm
+            const doc = new jsPDF({
                 orientation: 'landscape',
                 unit: 'mm',
-                format: [85.6, 54]
+                format: [100, 65]
             });
 
-            // 4. Tempel gambar dan unduh
-            pdf.addImage(imgData, 'PNG', 0, 0, 85.6, 54);
-            pdf.save(`Kartu_Peserta_${noPeserta}.pdf`);
-        } catch (error) {
-            console.error("Gagal mencetak PDF:", error);
-            alert("Data berhasil disimpan, namun terjadi kesalahan saat mencetak PDF.");
+            dataPesertaArray.forEach((peserta, index) => {
+                // Jika data index ke-1 dst, tambahkan halaman baru (gabung dalam 1 file PDF!)
+                if (index > 0) {
+                    doc.addPage([100, 65], 'landscape');
+                }
+
+                // --- PROSES RENDER DESAIN DENGAN KODE JSPDF NATIVE (Mencegah Lag & Blur) ---
+                // 1. Background Putih Bersih
+                doc.setFillColor(255, 255, 255);
+                doc.rect(0, 0, 100, 65, 'F');
+
+                // 2. Garis Pembatas Atas Gradient (Warna Indigo Kebiruan)
+                doc.setFillColor(79, 70, 229);
+                doc.rect(0, 0, 100, 3, 'F');
+
+                // 3. Border Luar Kartu
+                doc.setDrawColor(30, 41, 59);
+                doc.setLineWidth(0.5);
+                doc.rect(0, 0, 100, 65, 'S');
+
+                // 4. JUDUL UTAMA (Header)
+                doc.setTextColor(15, 23, 42);
+                doc.setFont("Helvetica", "bold");
+                doc.setFontSize(11);
+                doc.text("KARTU TANDA PESERTA UJIAN", 50, 10, { align: "center" });
+
+                doc.setTextColor(100, 116, 139);
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(7);
+                doc.text("UJIAN BERBASIS KOMPUTER (CBT)", 50, 14, { align: "center" });
+
+                // 5. Garis Pembatas Tipis Tengah
+                doc.setDrawColor(226, 232, 240);
+                doc.setLineWidth(0.3);
+                doc.line(5, 17, 95, 17);
+
+                // 6. ISI DATA PESERTA (Label & Value)
+                doc.setFontSize(8);
+                
+                // Baris 1: Nomor Peserta
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(100, 116, 139);
+                doc.text("NO PESERTA", 8, 25);
+                doc.text(":", 33, 25);
+                doc.setTextColor(30, 41, 59);
+                doc.setFont("Helvetica", "bold");
+                doc.setFontSize(9);
+                doc.text(peserta.noPeserta.toUpperCase(), 36, 25);
+
+                // Baris 2: Nama
+                doc.setFontSize(8);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(100, 116, 139);
+                doc.text("NAMA", 8, 33);
+                doc.text(":", 33, 33);
+                doc.setTextColor(15, 23, 42);
+                doc.setFont("Helvetica", "bold");
+                doc.text(peserta.namaPeserta, 36, 33);
+
+                // Baris 3: Asal Sekolah
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(100, 116, 139);
+                doc.text("ASAL SEKOLAH", 8, 41);
+                doc.text(":", 33, 41);
+                doc.setTextColor(51, 65, 85);
+                doc.setFont("Helvetica", "normal");
+                doc.text(peserta.asalSekolah, 36, 41);
+
+                // 7. Watermark / Garis Pembatas bawah
+                doc.setDrawColor(226, 232, 240);
+                doc.setLineWidth(0.2);
+                doc.line(5, 52, 95, 52);
+
+                // 8. Footer Keterangan Kartu
+                doc.setTextColor(148, 163, 184);
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(6);
+                doc.text("Harap kartu ini dibawa dan dijaga dengan baik selama ujian berlangsung.", 50, 57, { align: "center" });
+            });
+
+            // LANGSUNG DOWNLOAD SEBAGAI 1 FILE PDF UTUH!
+            doc.save(namaFile);
         }
-    }
 
-    // FUNGSI UTAMA TAMBAH PESERTA KE GOOGLE SHEETS
-    function tambahPeserta(e) {
-      e.preventDefault();
-      
-      const noPeserta = document.getElementById('input-no').value.trim().toUpperCase();
-      const namaPeserta = document.getElementById('input-nama').value.trim();
-      const asalSekolah = document.getElementById('input-sekolah').value.trim();
-      
-      const btn = document.getElementById('btn-simpan');
-      const alertBox = document.getElementById('alert-msg');
-      
-      btn.innerText = "⏳ Menyimpan & Membuat PDF...";
-      btn.disabled = true;
-      alertBox.classList.add('d-none');
+        // =========================================================
+        // JALUR 1 & 3: SUBMIT INPUT MANUAL DAN LANGSUNG CETAK TUNGGAL
+        // =========================================================
+        document.getElementById('formInput').addEventListener('submit', function(e) {
+            e.preventDefault();
+            tunjukkanLog("Sedang menyimpan data ke database Google Sheets...");
 
-      fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({
-          action: 'addParticipant',
-          noPeserta: noPeserta,
-          namaPeserta: namaPeserta,
-          asalSekolah: asalSekolah
-        })
-      })
-      .then(res => res.json())
-      .then(res => {
-        alertBox.classList.remove('d-none');
-        if(res.success) {
-          alertBox.className = "alert alert-success mt-4 text-center fw-bold";
-          alertBox.innerText = "✅ Berhasil! Peserta tersimpan & Kartu sedang diunduh.";
-          
-          // 👉 PANGGIL FUNGSI PDF DI SINI KARENA DATA SUKSES MASUK
-          downloadKartuPDF(noPeserta, namaPeserta, asalSekolah);
+            const noPeserta = document.getElementById('noPeserta').value.trim();
+            const namaPeserta = document.getElementById('namaPeserta').value.trim();
+            const asalSekolah = document.getElementById('asalSekolah').value.trim();
 
-          document.getElementById('form-admin').reset(); // Kosongkan form
-        } else {
-          alertBox.className = "alert alert-danger mt-4 text-center fw-bold";
-          alertBox.innerText = "❌ Gagal: " + res.message;
-        }
-      })
-      .catch(err => {
-        alertBox.classList.remove('d-none');
-        alertBox.className = "alert alert-danger mt-4 text-center fw-bold";
-        alertBox.innerText = "❌ Terjadi kesalahan jaringan.";
-      })
-      .finally(() => {
-        btn.innerText = "➕ TAMBAHKAN & CETAK KARTU";
-        btn.disabled = false;
-      });
-    }
-  </script>
+            fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "addParticipant",
+                    noPeserta: noPeserta,
+                    namaPeserta: namaPeserta,
+                    asalSekolah: asalSekolah
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    tunjukkanLog("Data berhasil disimpan! Mengunduh PDF kartu...", "success");
+                    // Langsung buat file PDF tunggal untuk orang ini
+                    generatePDFKartu([{
+                        noPeserta: noPeserta,
+                        namaPeserta: namaPeserta,
+                        asalSekolah: asalSekolah
+                    }], `Kartu_${noPeserta}.pdf`);
+                    document.getElementById('formInput').reset();
+                } else {
+                    tunjukkanLog("Gagal menyimpan: " + res.message, "error");
+                }
+            })
+            .catch(err => tunjukkanLog("Terjadi gangguan koneksi ke server.", "error"));
+        });
+
+        // =========================================================
+        // JALUR 2: CARI DATA TUNGGAL YANG SUDAH ADA & CETAK ULANG
+        // =========================================================
+        document.getElementById('btnCari').addEventListener('click', function() {
+            const noCari = document.getElementById('noCari').value.trim();
+            if(!noCari) return alert("Silakan ketik nomor ujian terlebih dahulu!");
+
+            tunjukkanLog("Sedang mencari data dengan nomor " + noCari + "...");
+
+            fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "getParticipant",
+                    noPeserta: noCari
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    tunjukkanLog("Data ditemukan! Mengunduh PDF...", "success");
+                    generatePDFKartu([{
+                        noPeserta: noCari,
+                        namaPeserta: res.namaPeserta,
+                        asalSekolah: res.asalSekolah
+                    }], `CetakUlang_${noCari}.pdf`);
+                } else {
+                    tunjukkanLog(res.message, "error");
+                }
+            })
+            .catch(err => tunjukkanLog("Gagal menghubungi server database.", "error"));
+        });
+
+        // =========================================================
+        // 🌟 JALUR BARU: FITUR UTAMA CETAK 10 PESERTA BORONGAN (MASSAL)
+        // =========================================================
+        document.getElementById('btnCetakMassal').addEventListener('click', function() {
+            tunjukkanLog("Sedang memproses & menarik 10 data terbaru dari tab Peserta...");
+
+            fetch(API_URL, {
+                method: "POST",
+                body: JSON.stringify({
+                    action: "getLast10Participants"
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    const dataBorongan = res.data; // Isi array berisi maksimal 10 peserta terbaru
+                    tunjukkanLog("Berhasil menarik " + dataBorongan.length + " data! Memulai proses penggabungan PDF massal...", "success");
+                    
+                    // Eksekusi fungsi penggabungan ke dalam 1 FILE PDF UTUH!
+                    generatePDFKartu(dataBorongan, "Kartu_Ujian_Massal_10_Peserta.pdf");
+                } else {
+                    tunjukkanLog("Gagal cetak massal: " + res.message, "error");
+                }
+            })
+            .catch(err => tunjukkanLog("Gagal memproses cetak massal. Periksa jaringan Anda.", "error"));
+        });
+    </script>
 </body>
 </html>
